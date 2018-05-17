@@ -27,22 +27,22 @@ void test_sm2_compress_public_key()
     char puk_hex[128] = { 0x0};
     int puk_hex_len;
 
-    hexToBin(puk, strlen(puk), puk_bin, &puk_bin_len);
+    hex_to_bin(puk, strlen(puk), puk_bin, &puk_bin_len);
 
     ret = sm2_compress_public_key(puk_bin, puk_bin_len, compressed_puk, &compressed_puk_len);
     TEST_ASSERT_EQUAL_INT(0, ret);
 
-    binToHex(compressed_puk, compressed_puk_len, puk_hex, &puk_bin_len);
+    bin_to_hex(compressed_puk, compressed_puk_len, puk_hex, &puk_bin_len);
     TEST_ASSERT_EQUAL_STRING(excepted_puk, puk_hex);
 
     //assert_string_equal(puk_hex, excepted_puk);
 
-    hexToBin(puk2, strlen(puk2), puk_bin, &puk_bin_len);
+    hex_to_bin(puk2, strlen(puk2), puk_bin, &puk_bin_len);
 
     ret = sm2_compress_public_key(puk_bin, puk_bin_len, compressed_puk, &compressed_puk_len);
     TEST_ASSERT_EQUAL_INT(0, ret);
 
-    binToHex(compressed_puk, compressed_puk_len, puk_hex, &puk_bin_len);
+    bin_to_hex(compressed_puk, compressed_puk_len, puk_hex, &puk_bin_len);
     TEST_ASSERT_EQUAL_STRING(excepted_puk2, puk_hex);
 }
 
@@ -62,22 +62,22 @@ void test_uncompress_public_key()
     char puk_hex[144] = { 0x0};
     int puk_hex_len;
 
-    hexToBin(excepted_puk, strlen(excepted_puk), puk_bin, &puk_bin_len);
+    hex_to_bin(excepted_puk, strlen(excepted_puk), puk_bin, &puk_bin_len);
 
     ret = sm2_uncompress_public_key(puk_bin, puk_bin_len, uncompressed_puk, &uncompressed_puk_len);
     TEST_ASSERT_EQUAL_INT(0, ret);
 
-    binToHex(uncompressed_puk, uncompressed_puk_len, puk_hex, &puk_bin_len);
+    bin_to_hex(uncompressed_puk, uncompressed_puk_len, puk_hex, &puk_bin_len);
 
     //assert_int_equal(ret, 0);
     TEST_ASSERT_EQUAL_STRING(puk, puk_hex);
 
-    hexToBin(excepted_puk2, strlen(excepted_puk2), puk_bin, &puk_bin_len);
+    hex_to_bin(excepted_puk2, strlen(excepted_puk2), puk_bin, &puk_bin_len);
 
     ret = sm2_uncompress_public_key(puk_bin, puk_bin_len, uncompressed_puk, &uncompressed_puk_len);
     TEST_ASSERT_EQUAL_INT(0, ret);
 
-    binToHex(uncompressed_puk, uncompressed_puk_len, puk_hex, &puk_bin_len);
+    bin_to_hex(uncompressed_puk, uncompressed_puk_len, puk_hex, &puk_bin_len);
     TEST_ASSERT_EQUAL_STRING(puk2, puk_hex);
 }
 
@@ -98,14 +98,14 @@ void test_sm2_sign_with_pem()
     char message_hex[256] = {0x0};
     int message_hex_len = 0;
 
-    hexToBin(pvk, strlen(pvk), pvk_bin, &pvk_bin_len);
-    binToHex(message, strlen(message), message_hex, &message_hex_len);
+    hex_to_bin(pvk, strlen(pvk), pvk_bin, &pvk_bin_len);
+    bin_to_hex(message, strlen(message), message_hex, &message_hex_len);
 
     printf("message hex = %s\n", message_hex);
 
     sm2_sign_with_pem(pvk_bin, pvk_bin_len, message, strlen(message), signature, &signature_len);
 
-    binToHex(signature, signature_len, signature_hex, &signature_hex_len);
+    bin_to_hex(signature, signature_len, signature_hex, &signature_hex_len);
     printf("signature[%d] = %s\n", signature_len, signature_hex);
 
 }
@@ -127,14 +127,14 @@ void test_sm2_sign()
     char message_hex[256] = {0x0};
     int message_hex_len = 0;
 
-    hexToBin(pvk, strlen(pvk), pvk_bin, &pvk_bin_len);
-    binToHex(message, strlen(message), message_hex, &message_hex_len);
+    hex_to_bin(pvk, strlen(pvk), pvk_bin, &pvk_bin_len);
+    bin_to_hex(message, strlen(message), message_hex, &message_hex_len);
 
     printf("message hex = %s\n", message_hex);
 
     sm2_sign(pvk_bin, pvk_bin_len, message, strlen(message), signature, &signature_len);
 
-    binToHex(signature, signature_len, signature_hex, &signature_hex_len);
+    bin_to_hex(signature, signature_len, signature_hex, &signature_hex_len);
     printf("signature[%d] = %s\n", signature_len, signature_hex);
 
 }
@@ -156,9 +156,9 @@ void test_sm2_sign_verify()
     int message_hex_len = 0;
     int ret;
 
-    hexToBin(puk, strlen(puk), puk_bin, &puk_bin_len);
-    binToHex(message, strlen(message), message_hex, &message_hex_len);
-    hexToBin(signature, strlen(signature), signature_bin, &signature_bin_len);
+    hex_to_bin(puk, strlen(puk), puk_bin, &puk_bin_len);
+    bin_to_hex(message, strlen(message), message_hex, &message_hex_len);
+    hex_to_bin(signature, strlen(signature), signature_bin, &signature_bin_len);
 
     printf("message hex = %s\n", message_hex);
 
@@ -185,9 +185,9 @@ void test_sm2_sign_verify_2()
     int message_bin_len = 0;
     int ret;
 
-    hexToBin(puk, strlen(puk), puk_bin, &puk_bin_len);
-    hexToBin(message_hex, strlen(message_hex), message_bin, &message_bin_len);
-    hexToBin(signature, strlen(signature), signature_bin, &signature_bin_len);
+    hex_to_bin(puk, strlen(puk), puk_bin, &puk_bin_len);
+    hex_to_bin(message_hex, strlen(message_hex), message_bin, &message_bin_len);
+    hex_to_bin(signature, strlen(signature), signature_bin, &signature_bin_len);
 
     printf("message hex = %s\n", message_hex);
 

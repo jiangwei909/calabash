@@ -183,7 +183,7 @@ int sm2_uncompress_public_key(const char *in, int in_len, char *out, int *out_le
     return results;
 }
 
-int hexToBin(const char *src, int src_len, char *dst, int *dst_len)
+int hex_to_bin(const char *src, int src_len, char *dst, int *dst_len)
 {
     char tmpbuff[4] = {0x0};
     int i = 0;
@@ -207,7 +207,7 @@ int hexToBin(const char *src, int src_len, char *dst, int *dst_len)
     return 0;
 }
 
-int binToHex(const char *src, int src_len, char *dst, int *dst_len)
+int bin_to_hex(const char *src, int src_len, char *dst, int *dst_len)
 {
     int i = 0;
 

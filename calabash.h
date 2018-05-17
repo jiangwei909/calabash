@@ -5,8 +5,8 @@
 #ifndef CALABASH_H
 #define CALABASH_H
 
-int hexToBin(const char *src, int src_len, char *dst, int *dst_len);
-int binToHex(const char *src, int src_len, char *dst, int *dst_len);
+int hex_to_bin(const char *src, int src_len, char *dst, int *dst_len);
+int bin_to_hex(const char *src, int src_len, char *dst, int *dst_len);
 
 int read_private_key_from_pem(const char *pemfile, unsigned char *private_key,
                               int *private_key_len);
