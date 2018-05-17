@@ -93,7 +93,7 @@ int sm2_compress_public_key(const char *puk, int puk_len,
     return 0;
 }
 
-int uncompress_public_key(unsigned char *in, int in_len, unsigned char *out, int *out_len)
+int sm2_uncompress_public_key(const char *in, int in_len, char *out, int *out_len)
 {
     EC_GROUP *curve_group = NULL; //
     EC_POINT *point = NULL;
@@ -104,6 +104,10 @@ int uncompress_public_key(unsigned char *in, int in_len, unsigned char *out, int
 
     unsigned char xy[200] = {0};
     unsigned char x_compressed_byte_array[33] = {0};
+
+    if (in_len != 33) {
+        return -1;
+    }
 
     do
     {

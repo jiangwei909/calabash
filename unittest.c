@@ -64,21 +64,21 @@ void test_uncompress_public_key()
 
     hexToBin(excepted_puk, strlen(excepted_puk), puk_bin, &puk_bin_len);
 
-    ret = uncompress_public_key(puk_bin, puk_bin_len, uncompressed_puk, &uncompressed_puk_len);
+    ret = sm2_uncompress_public_key(puk_bin, puk_bin_len, uncompressed_puk, &uncompressed_puk_len);
+    TEST_ASSERT_EQUAL_INT(0, ret);
 
     binToHex(uncompressed_puk, uncompressed_puk_len, puk_hex, &puk_bin_len);
 
     //assert_int_equal(ret, 0);
-    //assert_string_equal(puk_hex, puk);
+    TEST_ASSERT_EQUAL_STRING(puk, puk_hex);
 
     hexToBin(excepted_puk2, strlen(excepted_puk2), puk_bin, &puk_bin_len);
 
-    ret = uncompress_public_key(puk_bin, puk_bin_len, uncompressed_puk, &uncompressed_puk_len);
+    ret = sm2_uncompress_public_key(puk_bin, puk_bin_len, uncompressed_puk, &uncompressed_puk_len);
+    TEST_ASSERT_EQUAL_INT(0, ret);
 
     binToHex(uncompressed_puk, uncompressed_puk_len, puk_hex, &puk_bin_len);
-
-    //assert_int_equal(ret, 0);
-    //assert_string_equal(puk_hex, puk2);
+    TEST_ASSERT_EQUAL_STRING(puk2, puk_hex);
 }
 
 void test_sm2_sign_with_pem()
