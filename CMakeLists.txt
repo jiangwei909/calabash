@@ -6,13 +6,14 @@ IF (CMAKE_BUILD_TYPE MATCHES "Debug")
 ENDIF()
 
 IF (WIN32) 
-    add_definitions(-DWIN32)
+  add_definitions(-DWIN32)
+  set(OS_OPENSSL_DIR win)
 ENDIF()
 
-add_definitions(-Wall)
+#add_definitions(-Wall)
 
 include_directories(${OPENSSL_INCLUDE_PATH} unity)
-link_directories(${calabash_SOURCE_DIR}/libs/win)
+link_directories(${calabash_SOURCE_DIR}/libs/${OS_OPENSSL_DIR})
 
 add_library(calabash SHARED calabash.c)
 target_link_libraries(calabash libcrypto)

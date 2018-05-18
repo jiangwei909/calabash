@@ -284,7 +284,7 @@ int sm2_sign_with_pem(const unsigned char *pvk, int pvk_len, const char *data, i
     return 0;
 }
 
-int sm2_sign(const unsigned char *pvk, int pvk_len, const char *data, int data_len, char *signature, int *signature_len)
+int sm2_sign(const char *pvk, int pvk_len, const char *data, int data_len, char *signature, int *signature_len)
 {
     EVP_PKEY *pkey = NULL;
     EC_KEY *ec_key = NULL;
