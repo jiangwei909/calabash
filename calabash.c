@@ -538,7 +538,8 @@ end:
     return ret;
 }
 
-int read_private_key_from_pem(const char *pemfile, unsigned char *private_key, int *private_key_len)
+int read_private_key_from_pem(const char *pemfile, unsigned char *private_key,
+			      int *private_key_len)
 {
     BIO *fp;
     char *name = 0;
@@ -548,13 +549,13 @@ int read_private_key_from_pem(const char *pemfile, unsigned char *private_key, i
     int ret = -1;
 
 #ifdef WIN32
-    if (_access(pemfile, 0) != 0)
-    {
+    ret = _access(pemfile, 0);
 #else
-    if (access(pemfile, R_OK) != 0)
+    ret = access(pemfile, R_OK);
+#endif
+    
+    if (ret != 0)
     {
-#endif // DEBUG
-
         printf("Not found file: %s\n", pemfile);
         return -1;
     }
@@ -578,27 +579,56 @@ int read_private_key_from_pem(const char *pemfile, unsigned char *private_key, i
 #endif
 
     if (strncmp(name, "EC PARAMETERS", 13) == 0)
-    {
-        PEM_read_bio(fp, &name, &header, &buff, &buff_len);
+	{
+	    PEM_read_bio(fp, &name, &header, &buff, &buff_len);
 #ifdef DEBUG
-        printf("2buff len = %d data = \n", buff_len);
-        for (int i = 0; i < buff_len; i++)
-        {
-            printf("%02X", buff[i]);
-        }
-        printf("\n");
+	    printf("2buff len = %d data = \n", buff_len);
+	    for (int i = 0; i < buff_len; i++)
+		{
+		    printf("%02X", buff[i]);
+		}
+	    printf("\n");
 #endif
-        memcpy(private_key, buff, buff_len);
-        *private_key_len = buff_len;
-        ret = 0;
+	    memcpy(private_key, buff, buff_len);
+	    *private_key_len = buff_len;
+	    ret = 0;
+	}
+    else {
+	    printf("WARNING: This is not a EC key file.\n");
+	    ret = -3;
+	    goto err;
     }
-    else
-    {
-        printf("WARNING: This is not a EC key file.\n");
-        ret = -3;
-        goto err;
-    }
-err:
+  err:
     BIO_free(fp);
     return ret;
+}
+
+int sm2_generate_keypair(char* pvk, int* pvk_len, char* puk, int* puk_len)
+{
+    EC_KEY* ec_key = NULL;
+    int ret = -1;
+    const BIGNUM* bn_pvk = NULL;
+    EC_POINT* puk_point = NULL;
+    EC_GROUP *curve_group = NULL;
+    
+    ec_key = EC_KEY_new_by_curve_name(NID_sm2p256v1);    
+
+    ret = EC_KEY_generate_key(ec_key);
+
+    if (ret == 0) return -1;
+
+    bn_pvk = EC_KEY_get0_private_key(ec_key);
+    *pvk_len = BN_bn2bin(bn_pvk, pvk);
+
+    puk_point = EC_KEY_get0_public_key(ec_key);
+
+    curve_group = EC_GROUP_new_by_curve_name(NID_sm2p256v1);
+
+    ret = EC_POINT_point2oct(curve_group, puk_point,
+			     POINT_CONVERSION_UNCOMPRESSED,
+			     puk, 256, NULL);
+
+    *puk_len = ret;
+    
+    return 0;
 }

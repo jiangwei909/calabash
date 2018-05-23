@@ -69,4 +69,19 @@ int sm2_sign(const char *pvk, int pvk_len, const char *data,
 int sm2_sign_verify(const unsigned char *puk, int puk_len, const unsigned char *data,
                     int data_len, const unsigned char *signature, int sig_len);
 
+
+int sm2_get_puk_from_pvk(const char* pvk, int pvk_len, char* puk, int* puk_len);
+
+/**
+ *  @brief 生成公私密钥对
+ *  @details 生成一组SM2公私密钥对
+ * 
+ *  @param pvk 生成的私钥
+ *  @param pvk_len 生成的私钥的长度
+ *  @param puk 生成的公钥，以0x04开头
+ *  @param puk_len 生成的公钥长度
+ *  @return 成功返回0，否则表示失败
+ */
+int sm2_generate_keypair(char* pvk, int* pvk_len, char* puk, int* puk_len);
+			 
 #endif //CALABASH_H

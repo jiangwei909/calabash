@@ -215,6 +215,31 @@ void test_sm2_sign_verify_2()
     //assert_int_equal(ret, 0);
 }
 
+void test_sm2_generate_keypair()
+{
+    char puk[144] = { 0x0 };
+    char pvk[144] = { 0x0 };
+    int pvk_len;
+    int puk_len;
+
+    char puk_hex[512] = { 0x0};
+    char pvk_hex[512] = { 0x0};
+    int pvk_hex_len = 0;
+    int puk_hex_len = 0;
+    
+    int ret = -1;
+
+    ret = sm2_generate_keypair(pvk, &pvk_len, puk, &puk_len);
+    TEST_ASSERT_EQUAL_INT(0, ret);
+
+    ret = bin_to_hex(pvk, pvk_len, pvk_hex, &pvk_hex_len);
+
+    ret = bin_to_hex(puk, puk_len, puk_hex, &puk_hex_len);
+
+    printf("private key[%d]= %s\n", pvk_len, pvk_hex);
+    printf("public key[%d]= %s\n", puk_len, puk_hex);
+}
+
 int main(int argc, char* argv[]) {
 
     UNITY_BEGIN();
@@ -225,6 +250,7 @@ int main(int argc, char* argv[]) {
     RUN_TEST(test_sm2_sign);
     RUN_TEST(test_sm2_sign_verify);
     RUN_TEST(test_sm2_sign_verify_2);
-
+    RUN_TEST(test_sm2_generate_keypair);
+    
     return UNITY_END();
 }
