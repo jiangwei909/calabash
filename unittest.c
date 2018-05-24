@@ -240,6 +240,34 @@ void test_sm2_generate_keypair()
     printf("public key[%d]= %s\n", puk_len, puk_hex);
 }
 
+void test_sm2_get_puk_from_pvk()
+{
+    char puk[144] = { 0x0 };
+    char* pvk = "74F3D6BCC82D29819BC9D9445210B3C581373715E3D728A54580B675C3CD6620";
+    int pvk_len;
+    int puk_len;
+
+    char puk_hex[512] = { 0x0};
+    char pvk_hex[512] = { 0x0};
+    int pvk_hex_len = 0;
+    int puk_hex_len = 0;
+
+    char pvk_bin[64] = { 0x0};
+    int pvk_bin_len = 0;
+    char* expected_puk_hex = "0492F775BC22B55B8CCBD2B8BE78E9F64D6AA74283C3A5127F8A50DEE107456A7FE28E2A15C219408FE05147A8C968FD88D7A88179530F1D836392C00A4B484DCD";
+    
+    int ret = -1;
+
+    hex_to_bin(pvk, 64, pvk_bin, &pvk_bin_len);
+    
+    ret = sm2_get_puk_from_pvk(pvk_bin, pvk_bin_len, puk, &puk_len);
+    TEST_ASSERT_EQUAL_INT(0, ret);
+
+    ret = bin_to_hex(puk, puk_len, puk_hex, &puk_hex_len);
+
+    TEST_ASSERT_EQUAL_STRING(expected_puk_hex, puk_hex);
+}
+
 int main(int argc, char* argv[]) {
 
     UNITY_BEGIN();
@@ -251,6 +279,7 @@ int main(int argc, char* argv[]) {
     RUN_TEST(test_sm2_sign_verify);
     RUN_TEST(test_sm2_sign_verify_2);
     RUN_TEST(test_sm2_generate_keypair);
+    RUN_TEST(test_sm2_get_puk_from_pvk);
     
     return UNITY_END();
 }
