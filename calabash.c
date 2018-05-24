@@ -538,8 +538,7 @@ end:
     return ret;
 }
 
-int read_private_key_from_pem(const char *pemfile, unsigned char *private_key,
-			      int *private_key_len)
+int sm2_read_pvk_from_pemfile(const char* pemfile, char* pvk, int* pvk_len)
 {
     BIO *fp;
     char *name = 0;
@@ -554,49 +553,33 @@ int read_private_key_from_pem(const char *pemfile, unsigned char *private_key,
     ret = access(pemfile, R_OK);
 #endif
     
-    if (ret != 0)
-    {
+    if (ret != 0){
         printf("Not found file: %s\n", pemfile);
         return -1;
     }
 
     fp = BIO_new_file(pemfile, "r");
-    if (fp == NULL)
-    {
+    if (fp == NULL){
         printf("Failed to open file: %s", pemfile);
         ret = -2;
         goto err;
     }
 
     ret = PEM_read_bio(fp, &name, &header, &buff, &buff_len);
-#ifdef DEBUG
-    printf("1buff ret = %d len = %d name = %s data = \n", ret, buff_len, name);
-    for (int i = 0; i < buff_len; i++)
-    {
-        printf("%02X", buff[i]);
-    }
-    printf("\n");
-#endif
+    if (strncmp(name, "EC PARAMETERS", 13) == 0) {
+	PEM_read_bio(fp, &name, &header, &buff, &buff_len);
 
-    if (strncmp(name, "EC PARAMETERS", 13) == 0)
-	{
-	    PEM_read_bio(fp, &name, &header, &buff, &buff_len);
-#ifdef DEBUG
-	    printf("2buff len = %d data = \n", buff_len);
-	    for (int i = 0; i < buff_len; i++)
-		{
-		    printf("%02X", buff[i]);
-		}
-	    printf("\n");
-#endif
-	    memcpy(private_key, buff, buff_len);
-	    *private_key_len = buff_len;
-	    ret = 0;
-	}
-    else {
-	    printf("WARNING: This is not a EC key file.\n");
-	    ret = -3;
-	    goto err;
+	 EVP_PKEY* pkey = d2i_AutoPrivateKey(NULL, &buff, buff_len);
+	 EC_KEY* ec_key = EVP_PKEY_get0_EC_KEY(pkey);
+	 const BIGNUM *prv_bn_cont = EC_KEY_get0_private_key(ec_key);
+
+	 *pvk_len = BN_bn2bin(prv_bn_cont, pvk);
+	 ret = 0;
+	 
+    } else {
+	printf("WARNING: This is not a EC key file.\n");
+	ret = -3;
+	goto err;
     }
   err:
     BIO_free(fp);

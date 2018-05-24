@@ -11,6 +11,25 @@
 #include "calabash.h"
 #include "unity/unity.h"
 
+void test_sm2_read_pvk_from_pemfile()
+{
+    char* pemfile = "cakey.pem";
+    int ret = -1;
+    char pvk[64] = { 0x0 };
+    int pvk_len = 0;
+    char pvk_hex[128] = { 0x0 };
+    int pvk_hex_len = 0;
+    char* expected_pvk = "74F3D6BCC82D29819BC9D9445210B3C581373715E3D728A54580B675C3CD6620";
+    
+    ret = sm2_read_pvk_from_pemfile(pemfile, pvk, &pvk_len);
+
+    TEST_ASSERT_EQUAL_INT(0, ret);
+    TEST_ASSERT_EQUAL_INT(32, pvk_len);
+    
+    bin_to_hex(pvk, pvk_len, pvk_hex, &pvk_hex_len);
+    TEST_ASSERT_EQUAL_STRING(expected_pvk, pvk_hex);
+}
+
 void test_sm2_compress_public_key()
 {
     char *puk = "81bf68edf30e4ff2d57545703999d1df6edee63a1fc5f46c8fd768f2a4c2308bb328f1038af1295cbb1a4b29fc2e2ea0e05562e5058d8a94a703f03f9996327d";
@@ -272,6 +291,7 @@ int main(int argc, char* argv[]) {
 
     UNITY_BEGIN();
 
+    RUN_TEST(test_sm2_read_pvk_from_pemfile);
     RUN_TEST(test_sm2_compress_public_key);
     RUN_TEST(test_uncompress_public_key);
     RUN_TEST(test_sm2_sign_with_pem);
