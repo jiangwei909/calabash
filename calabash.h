@@ -32,6 +32,17 @@ int hex_to_bin(const char *src, int src_len, char *dst, int *dst_len);
 int bin_to_hex(const char *src, int src_len, char *dst, int *dst_len);
 
 /**
+ *  \brief 去掉SM2加密结果中的格式信息
+ *
+ *  Detailed description
+ *
+ *  \param param
+ *  \return return type
+ */
+int remove_format_from_cipher_text(const unsigned char* cipher_text, int cipher_text_len,
+				   unsigned char* no_fmt_string, int* no_fmt_string_len);
+
+/**
  *  @brief 从pem文件读取SM2私钥
  *  @details 从pem文件读取SM2私钥
  *  
@@ -101,5 +112,18 @@ int sm2_get_puk_from_pvk(const char* pvk, int pvk_len, char* puk, int* puk_len);
  *  @return 成功返回0，否则表示失败
  */
 int sm2_generate_keypair(char* pvk, int* pvk_len, char* puk, int* puk_len);
-			 
+
+/**
+ *  @brief 使用公钥对数据进行加密
+ *  @details 使用公钥对数据进行加密, 加密的结果为C1||C3||C2，C1是椭圆上点，C3是SM3摘要结果，C2是数据密文。C1长度为64字节（X长32字节，Y长32字节)，C3为32字节
+ * 
+ *  @param puk SM2公钥，用于对数据进行加密
+ *  @param puk_len SM2公钥长度
+ *  @param plain 待加密数据 
+ *  @param plain_len 待加密数据长度
+ *  @param cipher 加密后的数据密文
+ *  @param cipher_len 加密后的数据密文长度
+ *  @return 成功返回0，否则表示失败
+ */
+int sm2_encrypt(const char* puk, int puk_len, const char* plain, int plain_len, char* cipher, int* cipher_len);
 #endif //CALABASH_H

@@ -648,3 +648,141 @@ int sm2_generate_keypair(char* pvk, int* pvk_len, char* puk, int* puk_len)
     
     return 0;
 }
+
+int sm2_encrypt(const char* puk, int puk_len, const char* plain, int plain_len, char* cipher, int* cipher_len)
+{
+
+    EC_GROUP* group = NULL;
+    EC_KEY* ec_key = NULL;
+    BIGNUM* x = NULL;
+    BIGNUM* y = NULL;
+    int ret = 0;
+    int offset = 0;
+    int cipher_buffer_len = 0;
+    char cipher_buffer[256] = { 0x0 };
+    
+    group = EC_GROUP_new_by_curve_name(NID_sm2p256v1);
+
+    if (!(ec_key = EC_KEY_new()))
+    {
+        ret = -2;
+        goto end;
+    }
+
+    if (!EC_KEY_set_group(ec_key, group))
+    {
+        ret = -3;
+        goto end;
+    }
+
+    if (puk_len == 65) offset = 1;
+    
+    if ((x = BN_bin2bn(puk + offset, 32, NULL)) == NULL)
+    {
+        ret = -4;
+        goto end;
+    }
+    
+    if ((y = BN_bin2bn(puk + 32 + offset, 32, NULL)) == NULL)
+    {
+        ret = -5;
+        goto end;
+    }
+
+    if (!EC_KEY_set_public_key_affine_coordinates(ec_key, x, y))
+    {
+        ret = -6;
+        goto end;
+    }
+
+    if(!SM2_encrypt(NID_sm3, plain, plain_len, cipher_buffer, &cipher_buffer_len, ec_key)) {
+	return -1;
+    }
+
+    ret = remove_format_from_cipher_text(cipher_buffer, cipher_buffer_len, cipher, cipher_len);
+
+  end:
+    
+    return ret;
+}
+
+int remove_format_from_cipher_text(const unsigned char* cipher_text, int cipher_text_len,
+				   unsigned char* no_fmt_string, int* no_fmt_string_len)
+{
+    int char_of_length = 0;
+    int length_of_content = 0;
+    int offset = 0;
+    
+    if (cipher_text[0] != 0x30 ) return -1;
+
+    if (cipher_text[1] > 0x80) {
+	char_of_length = cipher_text[1] - 0x80;
+	switch(char_of_length) {
+	case 1:
+	    length_of_content = cipher_text[2];
+	    offset = 3;
+	    break;
+	case 2:
+	    length_of_content = cipher_text[2]*256 + cipher_text[3];
+	    offset = 4;
+	    break;
+	case 3:
+	    length_of_content = cipher_text[2]*256*256 + cipher_text[3]*256 + cipher_text[4];
+	    offset = 5;
+	    break;
+	}
+		
+    } else {
+	length_of_content = cipher_text[1];
+	offset = 2;
+    }
+
+    if (length_of_content + offset != cipher_text_len) return -2;
+
+    offset += 1;
+    int length_of_c1x = *(cipher_text+offset);
+
+    if (length_of_c1x > 32) {
+	offset += 2;
+    } else {
+	offset += 1;
+    }
+    
+    memcpy(no_fmt_string, cipher_text + offset, 32);
+    offset += 32;
+
+    offset += 1;
+    int length_of_c1y = *(cipher_text+offset);
+
+    if (length_of_c1y > 32) {
+	offset += 2;
+    } else {
+	offset += 1;
+    }
+    
+    memcpy(no_fmt_string + 32, cipher_text + offset, 32);
+    offset += 32;
+
+    offset += 1;
+    int length_of_c3 = *(cipher_text +offset);
+    
+    if (length_of_c3 > 32) {
+	offset += 2;
+    } else {
+	offset += 1;
+    }
+    
+    memcpy(no_fmt_string + 64, cipher_text + offset, 32);
+    offset += 32;
+
+    offset += 1;
+    int length_of_c2 = cipher_text[offset];
+
+    offset +=1;    
+    memcpy(no_fmt_string + 96, cipher_text + offset, length_of_c2);
+    offset += length_of_c2;
+
+    *no_fmt_string_len = 96 + length_of_c2;
+    
+    return 0;
+}
