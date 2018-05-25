@@ -21,6 +21,7 @@
 #include <openssl/gmapi.h>
 
 #include "calabash.h"
+#include "internal.h"
 
 int sm2_compress_public_key(const char *puk, int puk_len,
                             char *compressed_puk, int *compressed_puk_len)
@@ -728,8 +729,10 @@ int sm2_decrypt(const char* pvk, int pvk_len, const char* cipher, int cipher_len
         return -1;
     }
 
+    ret = encode_cipher_text(cipher, cipher_len, encoded_cipher, &encoded_cipher_len);
+    
     if(!SM2_decrypt(NID_sm3, encoded_cipher, encoded_cipher_len, plain, plain_len, ec_key)) {
-	return -1;
+	return -2;
     }
 
     return 0;

@@ -127,5 +127,17 @@ int sm2_generate_keypair(char* pvk, int* pvk_len, char* puk, int* puk_len);
  */
 int sm2_encrypt(const char* puk, int puk_len, const char* plain, int plain_len, char* cipher, int* cipher_len);
 
+/**
+ *  @brief 使用SM2私钥对数据进行加密
+ *  @details 使用SM2私钥对数据进行加密
+ * 
+ *  @param pvk SM2私钥，用于对数据进行加密
+ *  @param pvk_len SM2私钥长度
+ *  @param cipher 待解密数据,数据形式为C1||C3||C2，C1是椭圆上点，C3是SM3摘要结果，C2是数据密文。C1长度为64字节（X长32字节，Y长32字节)，C3为32字节
+ *  @param cipher_len 待解密数据长度
+ *  @param plain 解密后的数据明文
+ *  @param plain_len 解密后的数据明文长度
+ *  @return 成功返回0，否则表示失败
+ */
 int sm2_decrypt(const char* pvk, int pvk_len, const char* cipher, int cipher_len, char* plain, int* plain_len);
 #endif //CALABASH_H
