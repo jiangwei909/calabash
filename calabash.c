@@ -738,3 +738,8 @@ int sm2_decrypt(const char* pvk, int pvk_len, const char* cipher, int cipher_len
     return 0;
 }
 
+int sm3_digest(const char* data, int data_len, char* digest)
+{
+    sm3(data, data_len, digest);
+    return 0;
+}

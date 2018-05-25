@@ -130,4 +130,16 @@ int sm2_encrypt(const char* puk, int puk_len, const char* plain, int plain_len, 
  *  @return 成功返回0，否则表示失败
  */
 int sm2_decrypt(const char* pvk, int pvk_len, const char* cipher, int cipher_len, char* plain, int* plain_len);
+
+/**
+ *  @brief 计算SM3摘要
+ *  @details 计算SM3摘要
+ *
+ *  @param data 待计算的数据
+ *  @param data_len 待计算的数据长度
+ *  @param digest 摘要值,固定长度32
+ *  @return 成功返回0，否则表示失败
+ */
+int sm3_digest(const char* data, int data_len, char* digest);
+
 #endif //CALABASH_H
