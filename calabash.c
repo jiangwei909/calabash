@@ -740,49 +740,24 @@ int remove_format_from_cipher_text(const unsigned char* cipher_text, int cipher_
     if (length_of_content + offset != cipher_text_len) return -2;
 
     offset += 1;
-    int length_of_c1x = *(cipher_text+offset);
+    *no_fmt_string_len = 0;
+    for (int i = 0; i < 4; i++) {
+	
+	int length_of_c1x = *(cipher_text+offset);
+	offset +=1;
+	if (i < 3) {
+	    if (length_of_c1x > 32) {
+		offset += 1;
+	    }
+	    length_of_c1x = 32;
+	}
 
-    if (length_of_c1x > 32) {
-	offset += 2;
-    } else {
+	memcpy(no_fmt_string + i*32, cipher_text + offset, length_of_c1x);
+	offset += length_of_c1x;
+	*no_fmt_string_len += length_of_c1x;
+
 	offset += 1;
     }
-    
-    memcpy(no_fmt_string, cipher_text + offset, 32);
-    offset += 32;
-
-    offset += 1;
-    int length_of_c1y = *(cipher_text+offset);
-
-    if (length_of_c1y > 32) {
-	offset += 2;
-    } else {
-	offset += 1;
-    }
-    
-    memcpy(no_fmt_string + 32, cipher_text + offset, 32);
-    offset += 32;
-
-    offset += 1;
-    int length_of_c3 = *(cipher_text +offset);
-    
-    if (length_of_c3 > 32) {
-	offset += 2;
-    } else {
-	offset += 1;
-    }
-    
-    memcpy(no_fmt_string + 64, cipher_text + offset, 32);
-    offset += 32;
-
-    offset += 1;
-    int length_of_c2 = cipher_text[offset];
-
-    offset +=1;    
-    memcpy(no_fmt_string + 96, cipher_text + offset, length_of_c2);
-    offset += length_of_c2;
-
-    *no_fmt_string_len = 96 + length_of_c2;
     
     return 0;
 }
