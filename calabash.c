@@ -700,7 +700,7 @@ int sm2_encrypt(const char* puk, int puk_len, const char* plain, int plain_len, 
 	return -1;
     }
 
-    ret = remove_format_from_cipher_text(cipher_buffer, cipher_buffer_len, cipher, cipher_len);
+    ret = decode_cipher_text(cipher_buffer, cipher_buffer_len, cipher, cipher_len);
 
   end:
     
@@ -738,58 +738,3 @@ int sm2_decrypt(const char* pvk, int pvk_len, const char* cipher, int cipher_len
     return 0;
 }
 
-int remove_format_from_cipher_text(const unsigned char* cipher_text, int cipher_text_len,
-				   unsigned char* no_fmt_string, int* no_fmt_string_len)
-{
-    int char_of_length = 0;
-    int length_of_content = 0;
-    int offset = 0;
-    
-    if (cipher_text[0] != 0x30 ) return -1;
-
-    if (cipher_text[1] > 0x80) {
-	char_of_length = cipher_text[1] - 0x80;
-	switch(char_of_length) {
-	case 1:
-	    length_of_content = cipher_text[2];
-	    offset = 3;
-	    break;
-	case 2:
-	    length_of_content = cipher_text[2]*256 + cipher_text[3];
-	    offset = 4;
-	    break;
-	case 3:
-	    length_of_content = cipher_text[2]*256*256 + cipher_text[3]*256 + cipher_text[4];
-	    offset = 5;
-	    break;
-	}
-		
-    } else {
-	length_of_content = cipher_text[1];
-	offset = 2;
-    }
-
-    if (length_of_content + offset != cipher_text_len) return -2;
-
-    offset += 1;
-    *no_fmt_string_len = 0;
-    for (int i = 0; i < 4; i++) {
-	
-	int length_of_c1x = *(cipher_text+offset);
-	offset +=1;
-	if (i < 3) {
-	    if (length_of_c1x > 32) {
-		offset += 1;
-	    }
-	    length_of_c1x = 32;
-	}
-
-	memcpy(no_fmt_string + i*32, cipher_text + offset, length_of_c1x);
-	offset += length_of_c1x;
-	*no_fmt_string_len += length_of_c1x;
-
-	offset += 1;
-    }
-    
-    return 0;
-}

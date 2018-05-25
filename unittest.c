@@ -352,7 +352,7 @@ void test_remove_format_from_cipher_text()
     int no_string_hex_len;
     
     hex_to_bin(cipher_text, strlen(cipher_text), cipher_text_bin, &cipher_text_bin_len); 
-    ret = remove_format_from_cipher_text(cipher_text_bin, cipher_text_bin_len, no_string, &no_string_len);
+    ret = decode_cipher_text(cipher_text_bin, cipher_text_bin_len, no_string, &no_string_len);
     TEST_ASSERT_EQUAL_INT(0, ret);
 
     bin_to_hex(no_string, no_string_len, no_string_hex, &no_string_hex_len);

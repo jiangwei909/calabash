@@ -31,16 +31,6 @@ int hex_to_bin(const char *src, int src_len, char *dst, int *dst_len);
  */
 int bin_to_hex(const char *src, int src_len, char *dst, int *dst_len);
 
-/**
- *  \brief 去掉SM2加密结果中的格式信息
- *
- *  Detailed description
- *
- *  \param param
- *  \return return type
- */
-int remove_format_from_cipher_text(const unsigned char* cipher_text, int cipher_text_len,
-				   unsigned char* no_fmt_string, int* no_fmt_string_len);
 
 /**
  *  @brief 从pem文件读取SM2私钥
