@@ -706,6 +706,35 @@ int sm2_encrypt(const char* puk, int puk_len, const char* plain, int plain_len, 
     return ret;
 }
 
+int sm2_decrypt(const char* pvk, int pvk_len, const char* cipher, int cipher_len, char* plain, int* plain_len)
+{
+    EC_KEY* ec_key = NULL;
+    EC_GROUP* group = NULL;
+    EC_POINT* puk_point = NULL;
+    BIGNUM* prv_bn = NULL;
+
+    char encoded_cipher[512] = { 0x0 };
+    int encoded_cipher_len = 0;
+    int ret = -1;
+
+    prv_bn = BN_bin2bn(pvk, pvk_len, NULL);
+    ec_key = EC_KEY_new_by_curve_name(NID_sm2p256v1);
+    group = EC_KEY_get0_group(ec_key);
+    puk_point = EC_POINT_new(group);
+
+    if (!EC_KEY_set_private_key(ec_key, prv_bn))
+    {
+        printf("set private key failed.\n");
+        return -1;
+    }
+
+    if(!SM2_decrypt(NID_sm3, encoded_cipher, encoded_cipher_len, plain, plain_len, ec_key)) {
+	return -1;
+    }
+
+    return 0;
+}
+
 int remove_format_from_cipher_text(const unsigned char* cipher_text, int cipher_text_len,
 				   unsigned char* no_fmt_string, int* no_fmt_string_len)
 {

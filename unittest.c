@@ -9,6 +9,7 @@
 #include <setjmp.h>
 
 #include "calabash.h"
+#include "internal.h"
 #include "unity/unity.h"
 
 void test_sm2_read_pvk_from_pemfile()
@@ -333,6 +334,28 @@ void test_remove_format_from_cipher_text()
     TEST_ASSERT_EQUAL_STRING(expected_no_string, no_string_hex);
 }
 
+void test_encode_cipher_text()
+{
+    char* cipher_text = "60EDC5BAFEDBD1B8774A28314035D6CED587E166FCC399F3166499C7D98054A3C60E7506FFABBEFE21FF59AABDC9BC255B7D8F4D4A597506FEF099DC704339A52FD12F6B82E5E81982EBD68E679E2EEE0E9294604BF147B565C8BC450F0AB5B2D5CE6D9943D09DA2CF544565C67E867AC23A3AEA4BA51211248D745C5D32894EC0352AF6C8956EE6A640C74F30DDC20D";
+    int cipher_text_len;
+    char cipher_text_bin[2048] = { 0x0 };
+    int cipher_text_bin_len;
+    int ret = -1;
+    char no_string[1024] = { 0x0 };
+    int no_string_len = 0;
+    char* expected_no_string = "308199022060EDC5BAFEDBD1B8774A28314035D6CED587E166FCC399F3166499C7D98054A3022100C60E7506FFABBEFE21FF59AABDC9BC255B7D8F4D4A597506FEF099DC704339A504202FD12F6B82E5E81982EBD68E679E2EEE0E9294604BF147B565C8BC450F0AB5B20430D5CE6D9943D09DA2CF544565C67E867AC23A3AEA4BA51211248D745C5D32894EC0352AF6C8956EE6A640C74F30DDC20D";
+    char no_string_hex[2096] = { 0x0 };
+    int no_string_hex_len;
+    
+    hex_to_bin(cipher_text, strlen(cipher_text), cipher_text_bin, &cipher_text_bin_len); 
+    ret = encode_cipher_text(cipher_text_bin, cipher_text_bin_len, no_string, &no_string_len);
+    TEST_ASSERT_EQUAL_INT(0, ret);
+
+    bin_to_hex(no_string, no_string_len, no_string_hex, &no_string_hex_len);
+    
+    TEST_ASSERT_EQUAL_STRING(expected_no_string, no_string_hex);
+}
+
 int main(int argc, char* argv[]) {
 
     UNITY_BEGIN();
@@ -348,6 +371,7 @@ int main(int argc, char* argv[]) {
     RUN_TEST(test_sm2_get_puk_from_pvk);
     RUN_TEST(test_sm2_encrypt);
     RUN_TEST(test_remove_format_from_cipher_text);
-    
+    RUN_TEST(test_encode_cipher_text);
+       
     return UNITY_END();
 }

@@ -126,4 +126,6 @@ int sm2_generate_keypair(char* pvk, int* pvk_len, char* puk, int* puk_len);
  *  @return 成功返回0，否则表示失败
  */
 int sm2_encrypt(const char* puk, int puk_len, const char* plain, int plain_len, char* cipher, int* cipher_len);
+
+int sm2_decrypt(const char* pvk, int pvk_len, const char* cipher, int cipher_len, char* plain, int* plain_len);
 #endif //CALABASH_H

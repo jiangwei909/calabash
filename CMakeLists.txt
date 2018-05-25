@@ -15,9 +15,9 @@ ENDIF()
 include_directories(${OPENSSL_INCLUDE_PATH} unity)
 link_directories(${calabash_SOURCE_DIR}/libs/${OS_OPENSSL_DIR})
 
-add_library(calabash SHARED calabash.c)
+add_library(calabash SHARED calabash.c internal.c)
 target_link_libraries(calabash libcrypto)
 
 #add_executable(tinygmca ${SOURCE_FILES} )
-add_executable(unittest unittest.c calabash.c unity/unity.c unity/unity.h)
+add_executable(unittest unittest.c calabash.c unity/unity.c unity/unity.h internal.c)
 target_link_libraries(unittest libcrypto)
