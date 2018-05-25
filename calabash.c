@@ -587,6 +587,47 @@ int sm2_read_pvk_from_pemfile(const char* pemfile, char* pvk, int* pvk_len)
     return ret;
 }
 
+int sm2_read_puk_from_pemfile(const char* pemfile, char* puk, int* puk_len)
+{
+    BIO *fp;
+    char *name = 0;
+    char *header = 0;
+    unsigned char *buff = 0x0;
+    long buff_len;
+    int ret = -1;
+
+#ifdef WIN32
+    ret = _access(pemfile, 0);
+#else
+    ret = access(pemfile, R_OK);
+#endif
+    
+    if (ret != 0){
+        printf("Not found file: %s\n", pemfile);
+        return -1;
+    }
+
+    fp = BIO_new_file(pemfile, "r");
+    if (fp == NULL){
+        printf("Failed to open file: %s", pemfile);
+        return -2;
+    }
+
+    ret = PEM_read_bio(fp, &name, &header, &buff, &buff_len);
+
+    if (strncmp(name, "PUBLIC KEY", 10) == 0) {
+	memcpy(puk, buff + (buff_len - 64), 64);
+	*puk_len = 64;
+	ret = 0;
+    } else {
+	printf("WARNING: This is not a valid pem key file.\n");
+	ret = -3;
+    }
+
+    BIO_free(fp);
+    return 0;
+}
+
 int sm2_get_puk_from_pvk(const char* pvk, int pvk_len, char* puk, int* puk_len)
 {
     EC_KEY* ec_key = NULL;

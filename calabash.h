@@ -44,6 +44,18 @@ int bin_to_hex(const char *src, int src_len, char *dst, int *dst_len);
 int sm2_read_pvk_from_pemfile(const char *pemfile, char *pvk, int *pvk_len);
 
 /**
+ *  @brief 从pem文件读取SM2公钥
+ *  @details 从pem文件读取SM2公钥
+ *  
+ *  @param pemfile pem文件路径
+ *  @param pvk 从pem文件中返回的sm2公钥
+ *  @param pvk_len 从pem文件中返回的sm2公钥长度，通常为64字节
+ *  @return 成功返回0, 否则表示失败
+ */
+
+int sm2_read_puk_from_pemfile(const char *pemfile, char *puk, int *puk_len);
+
+/**
  * @brief 压缩SM2国密算法的公钥
  * @details 对SM2国密算法的公钥进行压缩
  * 
