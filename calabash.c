@@ -824,3 +824,14 @@ int sm4_cbc_encrypt(const char* key, const char* iv, const char* plain, int plai
 
     return plain_len;
 }
+
+int sm4_cbc_decrypt(const char* key, const char* iv, const char* cipher, int cipher_len, char* plain)
+{
+    sms4_key_t sm4_key;
+    
+    sms4_set_decrypt_key(&sm4_key, key);
+
+    sms4_cbc_encrypt(cipher, plain, cipher_len, &sm4_key, iv, 0);
+
+    return cipher_len;
+}
