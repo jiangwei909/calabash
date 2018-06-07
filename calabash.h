@@ -157,12 +157,13 @@ int sm3_digest(const char* data, int data_len, char* digest);
 
 /**
  *  @brief SM4进行ECB加密
- *  @details SM4进行ECB加密
+ *  @details SM4进行ECB加密, 待加密的数据长度必须是16的倍数，如不足，需要调用者填充到16的倍数
  *
- *  @param data 待计算的数据
- *  @param data_len 待计算的数据长度
- *  @param digest 摘要值,固定长度32
- *  @return 成功返回0，否则表示失败
+ *  @param key 密钥的明文,必须16字节长
+ *  @param plain 待加密的数据明文
+ *  @param plain_len 待加密的数据明文长度
+ *  @param cipher 加密后的密文
+ *  @return 返回加密后密文的长度，负数表示失败
  */
 int sm4_ecb_encrypt(const char* key, const char* plain, int plain_len, char* cipher);
 #endif //CALABASH_H
