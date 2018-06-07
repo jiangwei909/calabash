@@ -799,3 +799,17 @@ int sm4_ecb_encrypt(const char* key, const char* plain, int plain_len, char* cip
     
     return plain_len;
 }
+
+
+int sm4_ecb_decrypt(const char* key, const char* cipher, int cipher_len, char* plain)
+{
+    sms4_key_t sm4_key;
+    
+    sms4_set_decrypt_key(&sm4_key, key);
+
+    for (int i = 0; i < cipher_len / 16; i++) {
+	sms4_decrypt(cipher + i*16, plain + i*16, &sm4_key);
+    }
+    
+    return cipher_len;
+}
