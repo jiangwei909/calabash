@@ -419,6 +419,30 @@ void test_sm3_digest()
     TEST_ASSERT_EQUAL_STRING(expected_digest, digest_hex);
 }
 
+void test_sm4_ecb_encrypt()
+{
+    char* key = "0123456789ABCDEFFEDCBA9876543210";
+    char* plain_hex = "0123456789ABCDEFFEDCBA98765432100123456789ABCDEFFEDCBA9876543210";
+    char* expected_cipher_hex = "681EDF34D206965E86B3E94F536E4246681EDF34D206965E86B3E94F536E4246";
+
+    char key_bin[32] = { 0x0 };
+    char plain_bin[128] = { 0x0 };
+    char cipher_bin[128] = { 0x0 };
+    char cipher_hex[256] = { 0x0 };
+    int plain_bin_len = 0;
+    
+    hex_to_bin(key, strlen(key), key_bin, NULL);
+    hex_to_bin(plain_hex, strlen(plain_hex), plain_bin, &plain_bin_len);
+    
+    int ret = sm4_ecb_encrypt(key_bin, plain_bin, plain_bin_len, cipher_bin);    
+    
+    TEST_ASSERT_EQUAL_INT(plain_bin_len, ret);
+    
+    bin_to_hex(cipher_bin, ret, cipher_hex, NULL);
+    
+    TEST_ASSERT_EQUAL_STRING(expected_cipher_hex, cipher_hex);
+}
+
 int main(int argc, char* argv[]) {
 
     UNITY_BEGIN();
@@ -439,6 +463,7 @@ int main(int argc, char* argv[]) {
     RUN_TEST(test_encode_cipher_text);
 
     RUN_TEST(test_sm3_digest);
+    RUN_TEST(test_sm4_ecb_encrypt);
     
     return UNITY_END();
 }

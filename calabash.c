@@ -19,6 +19,7 @@
 #include <openssl/bn.h>
 #include <openssl/ec.h>
 #include <openssl/gmapi.h>
+#include <openssl/sms4.h>
 
 #include "calabash.h"
 #include "internal.h"
@@ -195,9 +196,7 @@ int hex_to_bin(const char *src, int src_len, char *dst, int *dst_len)
         return -1;
     }
 
-    *dst_len = src_len / 2;
-
-    for (i = 0; i < *dst_len; i++)
+    for (i = 0; i < src_len / 2; i++)
     {
         memcpy(tmpbuff, src + i * 2, 2);
         t = strtol(tmpbuff, NULL, 16);
@@ -205,6 +204,8 @@ int hex_to_bin(const char *src, int src_len, char *dst, int *dst_len)
         memset(tmpbuff, 0x0, sizeof(tmpbuff));
     }
 
+    if (dst_len != NULL) *dst_len = src_len / 2;
+    
     return 0;
 }
 
@@ -217,8 +218,8 @@ int bin_to_hex(const char *src, int src_len, char *dst, int *dst_len)
         sprintf(dst + i * 2, "%02X", *(src + i) & 0xff);
     }
 
-    *dst_len = src_len * 2;
-
+    if (dst_len != NULL) *dst_len = src_len * 2;
+    
     return 0;
 }
 
@@ -783,4 +784,18 @@ int sm3_digest(const char* data, int data_len, char* digest)
 {
     sm3(data, data_len, digest);
     return 0;
+}
+
+
+int sm4_ecb_encrypt(const char* key, const char* plain, int plain_len, char* cipher)
+{
+    sms4_key_t sm4_key;
+    
+    sms4_set_encrypt_key(&sm4_key, key);
+
+    for (int i = 0; i < plain_len / 16; i++) {
+	sms4_encrypt(plain + i*16, cipher + i*16, &sm4_key);
+    }
+    
+    return plain_len;
 }

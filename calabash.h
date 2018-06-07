@@ -154,4 +154,15 @@ int sm2_decrypt(const char* pvk, int pvk_len, const char* cipher, int cipher_len
  */
 int sm3_digest(const char* data, int data_len, char* digest);
 
+
+/**
+ *  @brief SM4进行ECB加密
+ *  @details SM4进行ECB加密
+ *
+ *  @param data 待计算的数据
+ *  @param data_len 待计算的数据长度
+ *  @param digest 摘要值,固定长度32
+ *  @return 成功返回0，否则表示失败
+ */
+int sm4_ecb_encrypt(const char* key, const char* plain, int plain_len, char* cipher);
 #endif //CALABASH_H
