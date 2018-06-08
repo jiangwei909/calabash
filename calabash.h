@@ -203,5 +203,8 @@ int sm4_cbc_encrypt(const char* key, const char* iv, const char* plain, int plai
  *  @param plain 加密后的密文
  *  @return 返回解密后解文的长度，负数表示失败
  */
-int sm4_cbc_encrypt(const char* key, const char* iv, const char* cipher, int cipher_len, char* plain);
+int sm4_cbc_decrypt(const char* key, const char* iv, const char* cipher, int cipher_len, char* plain);
+
+
+int des_ecb_encrypt(const char* key, unsigned int key_len, const char* plain, int plain_len, char* cipher);
 #endif //CALABASH_H
