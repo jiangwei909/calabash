@@ -581,6 +581,67 @@ void test_des_ecb_encrypt()
 
 }
 
+void test_des_ecb_decrypt()
+{
+    char* key = "0123456789ABCDEF";
+    char* key2 = "0123456789ABCDEFFEDCBA9876543210";
+    char* key3 = "0123456789ABCDEFFEDCBA98765432100123456789ABCDEF";
+
+    char* expected_plain_hex1 = "0123456789ABCDEF";
+    char* expected_plain_hex2 = "0123456789ABCDEFFEDCBA9876543210";
+
+    char* cipher_hex1 = "56CC09E7CFDC4CEF";
+    char* cipher_hex2 = "1A4D672DCA6CB3351FD1B02B237AF9AE";
+    char* cipher_hex3 = "1A4D672DCA6CB3351FD1B02B237AF9AE";
+    
+    char key_bin[32] = { 0x0 };
+    char plain_bin[128] = { 0x0 };
+    char cipher_bin[128] = { 0x0 };
+    char plain_hex[256] = { 0x0 };
+    int cipher_bin_len = 0;
+    int plain_bin_len = 0;
+    char iv[16] = { 0x0 };
+    int key_len = 0;
+    
+    hex_to_bin(key, strlen(key), key_bin, &key_len);
+    hex_to_bin(cipher_hex1, strlen(cipher_hex1), cipher_bin, &cipher_bin_len);
+    
+    int ret = des_ecb_decrypt(key_bin, key_len, cipher_bin, cipher_bin_len, plain_bin);
+    
+    TEST_ASSERT_EQUAL_INT(cipher_bin_len, ret);
+    
+    bin_to_hex(plain_bin, ret, plain_hex, NULL);
+    
+    TEST_ASSERT_EQUAL_STRING(expected_plain_hex1, plain_hex);
+
+    // Test DES2
+    hex_to_bin(key2, strlen(key2), key_bin, &key_len);
+    hex_to_bin(cipher_hex2, strlen(cipher_hex2), cipher_bin, &cipher_bin_len);
+    
+    ret = des_ecb_decrypt(key_bin, key_len, cipher_bin, cipher_bin_len, plain_bin);
+    
+    TEST_ASSERT_EQUAL_INT(cipher_bin_len, ret);
+    
+    bin_to_hex(plain_bin, ret, plain_hex, NULL);
+    
+    TEST_ASSERT_EQUAL_STRING(expected_plain_hex2, plain_hex);
+
+    // Test DES3
+    hex_to_bin(key3, strlen(key3), key_bin, &key_len);
+    hex_to_bin(cipher_hex2, strlen(cipher_hex2), cipher_bin, &cipher_bin_len);
+
+    TEST_ASSERT_EQUAL_INT(16, cipher_bin_len);
+    
+    ret = des_ecb_decrypt(key_bin, key_len, cipher_bin, cipher_bin_len, plain_bin);
+    
+    TEST_ASSERT_EQUAL_INT(cipher_bin_len, ret);
+    
+    bin_to_hex(plain_bin, ret, plain_hex, NULL);
+    
+    TEST_ASSERT_EQUAL_STRING(expected_plain_hex2, plain_hex);
+
+}
+
 
 int main(int argc, char* argv[]) {
 
@@ -609,6 +670,7 @@ int main(int argc, char* argv[]) {
     RUN_TEST(test_sm4_cbc_decrypt);
 
     RUN_TEST(test_des_ecb_encrypt);
+    RUN_TEST(test_des_ecb_decrypt);
     
     return UNITY_END();
 }
