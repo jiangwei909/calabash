@@ -90,3 +90,48 @@ int rsa_decrypt(const char* pvk, int pvk_len, const char* cipher, int cipher_len
     
     return ret;
 }
+
+int rsa_sign(const char* pvk, int pvk_len, const char* msg, int msg_len, char* sign)
+{
+    int digest_alg = -1;
+    int sign_len = 0;
+    
+    EVP_PKEY* pkey = d2i_PrivateKey(EVP_PKEY_RSA, NULL, &pvk, pvk_len);
+
+    if (pkey == NULL) return -1;
+    
+    RSA* rsa = EVP_PKEY_get1_RSA(pkey);
+
+    switch(msg_len) {
+    case 16:
+	digest_alg = NID_md5;
+	break;
+    case 20:
+	digest_alg = NID_sha1;
+	break;
+    case 28:
+	digest_alg = NID_sha224;
+	break;
+    case 32:
+	digest_alg = NID_sha256;
+	break;
+    case 48:
+	digest_alg = NID_sha384;
+	break;
+    case 64:
+	digest_alg = NID_sha512;
+	break;
+    default:
+	return -2;
+    }
+    
+    int ret = RSA_sign(digest_alg, msg, msg_len, sign, &sign_len, rsa);
+    
+    RSA_free(rsa);
+
+    if (ret > 0) return sign_len;
+
+    ret = -1;
+    
+    return ret;
+}

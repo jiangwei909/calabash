@@ -218,4 +218,5 @@ int rsa_encrypt(const char* puk, int puk_len, const char* plain, int plain_len, 
 
 int rsa_decrypt(const char* pvk, int pvk_len, const char* cipher, int cipher_len, char* plain);
 
+int rsa_sign(const char* pvk, int pvk_len, const char* msg, int msg_len, char* sign);
 #endif //CALABASH_H
