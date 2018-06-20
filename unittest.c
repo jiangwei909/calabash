@@ -642,6 +642,56 @@ void test_des_ecb_decrypt()
 
 }
 
+void test_rsa_read_puk_from_pemfile()
+{
+    char* pemfile = "rsa_publickey.pem";
+    int ret = -1;
+    char pvk[2064] = { 0x0 };
+    int pvk_len = 0;
+    char pvk_hex[2128] = { 0x0 };
+    int pvk_hex_len = 0;
+    char* expected_pvk = "30819F300D06092A864886F70D010101050003818D0030818902818100A6D36FD33D75DDDACC3A7E978C187FC0FC57FEA133C7AA37438BEAC509874B1C621536D5F746D69E527A4E0A4B487A22E29BC2CC8D42C0AF7DE0E086CE0016452DF90CF5F470E6AAA2838F6AD4D1FCE4AB6153D850764E6B7BAF5037DA9A186B0D2763CFF843819C5AE9F149DBFCCBB33CAE9733CD040208E4690299C8A968550203010001";
+    
+    pvk_len = rsa_read_puk_from_pem_file(pemfile, pvk);
+
+    TEST_ASSERT_EQUAL_INT(162, pvk_len);
+    
+    bin_to_hex(pvk, pvk_len, pvk_hex, &pvk_hex_len);
+    TEST_ASSERT_EQUAL_STRING(expected_pvk, pvk_hex);
+}
+
+void test_rsa_encrypt()
+{
+    char* pemfile = "rsa_publickey.pem";
+    int ret = -1;
+    //char *pvk = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCm02/TPXXd2sw6fpeMGH/A/Ff+oTPHqjdDi+rFCYdLHGIVNtX3RtaeUnpOCktIeiLim8LMjULAr33g4IbOABZFLfkM9fRw5qqig49q1NH85KthU9hQdk5re69QN9qaGGsNJ2PP+EOBnFrp8Unb/MuzPK6XM80EAgjkaQKZyKloVQIDAQAB";
+    //char *pvk ="30819F300D06092A864886F70D010101050003818D0030818902818100A6D36FD33D75DDDACC3A7E978C187FC0FC57FEA133C7AA37438BEAC509874B1C621536D5F746D69E527A4E0A4B487A22E29BC2CC8D42C0AF7DE0E086CE0016452DF90CF5F470E6AAA2838F6AD4D1FCE4AB6153D850764E6B7BAF5037DA9A186B0D2763CFF843819C5AE9F149DBFCCBB33CAE9733CD040208E4690299C8A968550203010001";
+    char *pvk = "30818902818100A6D36FD33D75DDDACC3A7E978C187FC0FC57FEA133C7AA37438BEAC509874B1C621536D5F746D69E527A4E0A4B487A22E29BC2CC8D42C0AF7DE0E086CE0016452DF90CF5F470E6AAA2838F6AD4D1FCE4AB6153D850764E6B7BAF5037DA9A186B0D2763CFF843819C5AE9F149DBFCCBB33CAE9733CD040208E4690299C8A968550203010001";
+    
+    int pvk_len = 0;
+    char pvk_hex[2128] = { 0x0 };
+    int pvk_hex_len = 0;
+    char pvk_bin[256] = { 0x0 };
+    int pvk_bin_len = 0;
+    
+    char* expected_pvk = "";
+    char* plain = "12345678";
+    char cipher[512] = { 0x0 };
+
+    int cipher_len;
+
+    char cipher_hex[512] = { 0x0 };
+    int cipher_hex_len = 0;
+    
+    hex_to_bin(pvk, strlen(pvk), pvk_bin, &pvk_bin_len);
+    
+    cipher_len = rsa_encrypt(pvk_bin, pvk_bin_len, plain, strlen(plain), cipher);
+
+    TEST_ASSERT_EQUAL_INT(128, cipher_len);
+    
+    bin_to_hex(cipher, cipher_len, cipher_hex, &cipher_hex_len);
+    printf("Cipher hex= %s\n", cipher_hex);
+}
 
 int main(int argc, char* argv[]) {
 
@@ -671,6 +721,9 @@ int main(int argc, char* argv[]) {
 
     RUN_TEST(test_des_ecb_encrypt);
     RUN_TEST(test_des_ecb_decrypt);
+
+    RUN_TEST(test_rsa_read_puk_from_pemfile);
+    RUN_TEST(test_rsa_encrypt);
     
     return UNITY_END();
 }

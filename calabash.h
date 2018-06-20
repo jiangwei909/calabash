@@ -209,4 +209,13 @@ int sm4_cbc_decrypt(const char* key, const char* iv, const char* cipher, int cip
 int des_ecb_encrypt(const char* key, unsigned int key_len, const char* plain, int plain_len, char* cipher);
 
 int des_ecb_decrypt(const char* key, unsigned int key_len, const char* cipher, int plain_len, char* plain);
+
+
+
+int rsa_read_puk_from_pem_file(const char* pem_file, char* puk);
+
+int rsa_encrypt(const char* puk, int puk_len, const char* plain, int plain_len, char* cipher);
+
+int rsa_decrypt(const char* pvk, int pvk_len, const char* cipher, int cipher_len, char* plain);
+
 #endif //CALABASH_H
