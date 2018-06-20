@@ -757,6 +757,36 @@ void test_rsa_sign()
     TEST_ASSERT_EQUAL_STRING(expected_plain, cipher_hex);
 }
 
+void test_rsa_verify()
+{
+    int ret = -1;
+    char *pvk = "30818902818100A6D36FD33D75DDDACC3A7E978C187FC0FC57FEA133C7AA37438BEAC509874B1C621536D5F746D69E527A4E0A4B487A22E29BC2CC8D42C0AF7DE0E086CE0016452DF90CF5F470E6AAA2838F6AD4D1FCE4AB6153D850764E6B7BAF5037DA9A186B0D2763CFF843819C5AE9F149DBFCCBB33CAE9733CD040208E4690299C8A968550203010001";
+    
+    int pvk_len = 0;
+    char pvk_hex[2128] = { 0x0 };
+    int pvk_hex_len = 0;
+    char pvk_bin[1024] = { 0x0 };
+    int pvk_bin_len = 0;
+
+    char* expected_plain = "2087919DD89A7F540D275B1A7B1FF3C058335DF4571F420C5FFB733147C5AA57507C4E591FE13DBC130D088524E2CF2271AA771E865EA19DF30FA5555AB0D63944C4BA758A6A7E800C7A1D588BB4FF5A2DF36290790EA8D6DE902BE481AF685412C75B273342977B1949A01782F869C8E9E192597BB2EA095EE00E767CCD72E4";
+    char cipher_hex[1024] = { 0x0 };
+    char plain[256] =  { 0x0 };
+    int plain_len = 0;
+    
+    int cipher_hex_len;
+
+    char cipher_bin[512] = { 0x0 };
+    int cipher_bin_len = 0;
+    
+    hex_to_bin(pvk, strlen(pvk), pvk_bin, &pvk_bin_len);
+    hex_to_bin(cipher_hex, strlen(cipher_hex), cipher_bin, &cipher_bin_len);
+    hex_to_bin(expected_plain, 256, plain, &plain_len);
+    
+    ret = rsa_verify(pvk_bin, pvk_bin_len, cipher_bin, 16, plain, 128);
+
+    TEST_ASSERT_EQUAL_INT(0, ret);
+}
+
 int main(int argc, char* argv[]) {
 
     UNITY_BEGIN();
@@ -790,6 +820,7 @@ int main(int argc, char* argv[]) {
     RUN_TEST(test_rsa_encrypt);
     RUN_TEST(test_rsa_decrypt);
     RUN_TEST(test_rsa_sign);
+    RUN_TEST(test_rsa_verify);
     
     return UNITY_END();
 }
