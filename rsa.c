@@ -76,3 +76,17 @@ int rsa_encrypt(const char* puk, int puk_len, const char* plain, int plain_len, 
     
     return ret;
 }
+
+int rsa_decrypt(const char* pvk, int pvk_len, const char* cipher, int cipher_len, char* plain)
+{
+    EVP_PKEY* pkey = d2i_PrivateKey(EVP_PKEY_RSA, NULL, &pvk, pvk_len);
+
+    if (pkey == NULL) return -1;
+    
+    RSA* rsa = EVP_PKEY_get1_RSA(pkey);
+    
+    int ret = RSA_private_decrypt(cipher_len, cipher, plain, rsa, RSA_PKCS1_PADDING);    
+    RSA_free(rsa);
+    
+    return ret;
+}
