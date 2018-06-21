@@ -32,7 +32,7 @@ int hex_to_bin(const char *src, int src_len, char *dst, int *dst_len);
 int bin_to_hex(const char *src, int src_len, char *dst, int *dst_len);
 
 int base64_to_bin(const char *src, int src_len, char *dst);
-int bin_to_base64(const char *src, int src_len, char *dst);
+int bin_to_base64(const char *src, int src_len, int nl_flag, char *dst);
 
 /**
  *  @brief 从pem文件读取SM2私钥

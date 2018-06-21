@@ -41,3 +41,33 @@ int base64_to_bin(const char *src, int src_len, char *dst)
     BIO_free_all(bio);
     return size;
 }
+
+int bin_to_base64(const char *src, int src_len, int newline_flag, char *dst)
+{
+    BIO *b64, *bio;
+    BUF_MEM *bptr = NULL;
+    size_t size = 0;
+
+    if (src == NULL || dst == NULL)
+	return -1;
+
+    b64 = BIO_new(BIO_f_base64());
+    bio = BIO_new(BIO_s_mem());
+
+    if (newline_flag == 0x0) {
+	BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
+    }
+    
+    bio = BIO_push(b64, bio);
+
+    BIO_write(bio, src, src_len);
+    BIO_flush(bio);
+
+    BIO_get_mem_ptr(bio, &bptr);
+    memcpy(dst, bptr->data, bptr->length);
+
+    size = bptr->length;
+    
+    BIO_free_all(bio);
+    return size;
+}
