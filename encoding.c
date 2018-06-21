@@ -26,19 +26,32 @@ int base64_to_bin(const char *src, int src_len, char *dst)
     BUF_MEM *bptr = NULL;
     int counts;
     int size = 0;
-
+    int nl_flag = 0;
+    char *tmp_buff = NULL;
+    
     if (src == NULL || dst == NULL)
         return -1;
 
+    tmp_buff = (char*)malloc(src_len);
+
+    int j = 0;
+    for(int i = 0; i< src_len; i++) {
+	if (src[i] == 0x0A || src[i] == 0x0D || src[i] == 0x20) continue;
+	tmp_buff[j] = src[i];
+	j += 1;
+    }
+	    
     b64 = BIO_new(BIO_f_base64());
     BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
 
-    bio = BIO_new_mem_buf(src, src_len);
+    bio = BIO_new_mem_buf(tmp_buff, j);
     bio = BIO_push(b64, bio);
 
     size = BIO_read(bio, dst, src_len);
 
     BIO_free_all(bio);
+    free(tmp_buff);
+    
     return size;
 }
 

@@ -838,6 +838,19 @@ void test_bas64_to_bin()
     
     bin_to_hex(pvk, pvk_len, pvk_hex, &pvk_hex_len);
     TEST_ASSERT_EQUAL_STRING(expected_pvk, pvk_hex);
+
+    char* pem_str2 = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCm02/TPXXd2sw6fpeMGH/A/Ff+\n\
+oTPHqjdDi+rFCYdLHGIVNtX3RtaeUnpOCktIeiLim8LMjULAr33g4IbOABZFLfkM\n\
+9fRw5qqig49q1NH85KthU9hQdk5re69QN9qaGGsNJ2PP+EOBnFrp8Unb/MuzPK6X\n\
+M80EAgjkaQKZyKloVQIDAQAB\n";
+
+    pvk_len = base64_to_bin(pem_str2, strlen(pem_str2), pvk);
+
+    TEST_ASSERT_EQUAL_INT(162, pvk_len);
+    
+    bin_to_hex(pvk, pvk_len, pvk_hex, &pvk_hex_len);
+    TEST_ASSERT_EQUAL_STRING(expected_pvk, pvk_hex);
+
 }
 
 void test_bin_to_bas64()
