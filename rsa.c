@@ -61,6 +61,31 @@ int rsa_read_puk_from_pem_file(const char* pemfile, char* puk)
     return ret;
 }
 
+int rsa_decode_key_from_pem_str(const char* pem_str, int pem_str_len, char* puk)
+{
+    BIO *fp;
+    char *name = 0;
+    char *header = 0;
+    unsigned char *buff = 0x0;
+    long buff_len;
+    int ret = -1;
+    
+    fp = BIO_new_mem_buf(pem_str, pem_str_len);
+
+    ret = PEM_read_bio(fp, &name, &header, &buff, &buff_len);
+
+    if (ret > 0) {
+	memcpy(puk, buff, buff_len);
+	ret = buff_len;
+    } else {
+	printf("WARNING: This is not a valid pem string.\n");
+	ret = -3;
+    }
+
+    BIO_free(fp);
+    return ret;
+}
+
 int rsa_encrypt(const char* puk, int puk_len, const char* plain, int plain_len, char* cipher)
 {
     const unsigned char **u_puk = (const unsigned char**)&puk;

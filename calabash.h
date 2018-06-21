@@ -213,6 +213,7 @@ int des_ecb_decrypt(const char* key, unsigned int key_len, const char* cipher, i
 
 
 int rsa_read_puk_from_pem_file(const char* pem_file, char* puk);
+int rsa_decode_key_from_pem_str(const char* pem_str, int pem_str_len, char* puk);
 
 int rsa_encrypt(const char* puk, int puk_len, const char* plain, int plain_len, char* cipher);
 
