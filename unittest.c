@@ -898,6 +898,28 @@ void test_rsa_generate_key()
     printf("pvk= %s\npuk= %s\n", pvk_hex, puk_hex);
 }
 
+void test_rsa_encode_puk_to_pem_str()
+{
+    char* puk_hex = "30818902818100B378DC5DAE48CB55729F64095054F4F906C520BFC7F5EAAE0D50EE15CBA83B844CDBA02DA71B0D51CADD4466968BAAA9E4CF27C258E0DF8850F0D062385C1A67C2268281326D71200137631F3C031D56C69077BB3F03F2F677A32A0523A4A143B08C9BC1AE581721CC5735FFD416A1AC1E78A7B1D067B007DACCCEB96427CD2B0203010001";
+
+    char puk[256] = { 0x0 };
+    int puk_len;
+    char str[1024] =  { 0x0 };
+
+    char* expected_puk = "-----BEGIN RSA PUBLIC KEY-----\n\
+MIGJAoGBALN43F2uSMtVcp9kCVBU9PkGxSC/x/Xqrg1Q7hXLqDuETNugLacbDVHK\n\
+3URmlouqqeTPJ8JY4N+IUPDQYjhcGmfCJoKBMm1xIAE3Yx88Ax1WxpB3uz8D8vZ3\n\
+oyoFI6ShQ7CMm8GuWBchzFc1/9QWoaweeKex0GewB9rMzrlkJ80rAgMBAAE=\n\
+-----END RSA PUBLIC KEY-----\n";
+    
+    hex_to_bin(puk_hex, strlen(puk_hex), puk, &puk_len);
+    
+    int ret = rsa_encode_puk_to_pem_str(puk, puk_len, str);
+
+    TEST_ASSERT_NOT_EQUAL(-1, ret);
+    TEST_ASSERT_EQUAL_STRING(expected_puk, str);
+}
+
 int main(int argc, char* argv[]) {
 
     UNITY_BEGIN();
@@ -938,6 +960,7 @@ int main(int argc, char* argv[]) {
     RUN_TEST(test_bin_to_bas64);
 
     RUN_TEST(test_rsa_generate_key);
+    RUN_TEST(test_rsa_encode_puk_to_pem_str);
     
     return UNITY_END();
 }

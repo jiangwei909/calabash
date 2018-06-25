@@ -264,3 +264,29 @@ int rsa_generate_key(int bits, char* pvk, int* pvk_len, char* puk, int * puk_len
     
     return 0;
 }
+
+int rsa_encode_puk_to_pem_str(const char* puk, int * puk_len, char* str)
+{
+    int str_len;
+    int ret = -1;
+    
+    const unsigned char **u_puk = (const unsigned char**)&puk;
+
+    EVP_PKEY* pkey = d2i_PublicKey(EVP_PKEY_RSA, NULL, u_puk, puk_len);
+
+    if (pkey == NULL) return -1;
+    
+    RSA* rsa = EVP_PKEY_get1_RSA(pkey);
+
+    BIO *bio = BIO_new(BIO_s_mem());
+    PEM_write_bio_RSAPublicKey(bio, rsa);
+
+    str_len = BIO_pending(bio);
+    BIO_read(bio, str, str_len);
+    ret = str_len;
+    
+    BIO_free_all(bio);
+    
+    return ret;
+}
+

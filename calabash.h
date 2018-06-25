@@ -217,6 +217,7 @@ int rsa_read_puk_from_pem_file(const char* pem_file, char* puk);
 int rsa_decode_key_from_pem_str(const char* pem_str, int pem_str_len, char* puk);
 
 int rsa_generate_key(int bits, char* pvk, int* pvk_len, char* puk, int * puk_len);
+int rsa_encode_puk_to_pem_str(const char* puk, int * puk_len, char* str);
 
 int rsa_encrypt(const char* puk, int puk_len, const char* plain, int plain_len, char* cipher);
 
