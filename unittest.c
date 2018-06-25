@@ -890,10 +890,12 @@ void test_rsa_generate_key()
     
     int ret = rsa_generate_key(1024, pvk, &pvk_len, puk, &puk_len);
 
+    TEST_ASSERT_EQUAL_INT(0, ret);
+    
     bin_to_hex(pvk, pvk_len, pvk_hex, &pvk_hex_len);
     bin_to_hex(puk, puk_len, puk_hex, &puk_hex_len);
     
-    printf("pvk= %s\npuk= %s\n", pvk, puk);
+    printf("pvk= %s\npuk= %s\n", pvk_hex, puk_hex);
 }
 
 int main(int argc, char* argv[]) {

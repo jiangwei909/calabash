@@ -226,15 +226,38 @@ int rsa_generate_key(int bits, char* pvk, int* pvk_len, char* puk, int * puk_len
     PEM_write_bio_RSAPrivateKey(bio, rsa, NULL, NULL, 0, NULL, NULL);
 
     *pvk_len = BIO_pending(bio);
-    
-    BIO_read(bio, pvk, *pvk_len);
 
-    PEM_write_bio_RSAPublicKey(bio, rsa);
-
-    *puk_len = BIO_pending(bio);
-    BIO_read(bio, puk, *puk_len);
+    char *name = 0;
+    char *header = 0;
+    unsigned char *buff = 0x0;
+    long buff_len;
     
+    ret = PEM_read_bio(bio, &name, &header, &buff, &buff_len);
+
+    if (ret > 0) {
+	memcpy(pvk, buff, buff_len);
+	*pvk_len = buff_len;
+    } else {
+	ret = -3;
+    }
+
     BIO_free_all(bio);
+    
+    //BIO_read(bio, pvk, *pvk_len);
+
+    PEM_write_bio_RSAPublicKey(bio2, rsa);
+
+    *puk_len = BIO_pending(bio2);
+    //BIO_read(bio, puk, *puk_len);
+
+    ret = PEM_read_bio(bio2, &name, &header, &buff, &buff_len);
+    if (ret > 0) {
+	memcpy(puk, buff, buff_len);
+	*puk_len = buff_len;
+    } else {
+	ret = -3;
+    }
+    
     BIO_free_all(bio2);
     
     RSA_free(rsa);
