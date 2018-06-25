@@ -290,3 +290,26 @@ int rsa_encode_puk_to_pem_str(const char* puk, int * puk_len, char* str)
     return ret;
 }
 
+int rsa_encode_pvk_to_pem_str(const char* pvk, int pvk_len, char* str)
+{
+    int ret = -1;
+    
+    EVP_PKEY* pkey = d2i_PrivateKey(EVP_PKEY_RSA, NULL, &pvk, pvk_len);
+
+    if (pkey == NULL) return -1;
+    
+    RSA* rsa = EVP_PKEY_get1_RSA(pkey);
+
+    BIO *bio = BIO_new(BIO_s_mem());
+    PEM_write_bio_RSAPrivateKey(bio, rsa, NULL, NULL, 0, NULL, NULL);
+    
+    
+    ret = BIO_pending(bio);
+    
+    BIO_read(bio, str, ret);
+    
+    BIO_free_all(bio);
+    
+    return ret;
+}
+
