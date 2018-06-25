@@ -876,6 +876,25 @@ void test_bin_to_bas64()
     TEST_ASSERT_EQUAL_STRING(expected_pvk, pvk);
 }
 
+void test_rsa_generate_key()
+{
+    char pvk[2048] = { 0x0 };
+    int pvk_len = 0;
+    char puk[2048] = { 0x0 };
+    int puk_len = 0;
+
+    char pvk_hex[4096] = { 0x0 };
+    int pvk_hex_len = 0;
+    char puk_hex[4096] = { 0x0 };
+    int puk_hex_len = 0;
+    
+    int ret = rsa_generate_key(1024, pvk, &pvk_len, puk, &puk_len);
+
+    bin_to_hex(pvk, pvk_len, pvk_hex, &pvk_hex_len);
+    bin_to_hex(puk, puk_len, puk_hex, &puk_hex_len);
+    
+    printf("pvk= %s\npuk= %s\n", pvk, puk);
+}
 
 int main(int argc, char* argv[]) {
 
@@ -915,6 +934,8 @@ int main(int argc, char* argv[]) {
 
     RUN_TEST(test_bas64_to_bin);
     RUN_TEST(test_bin_to_bas64);
+
+    RUN_TEST(test_rsa_generate_key);
     
     return UNITY_END();
 }

@@ -204,3 +204,40 @@ int rsa_verify(const char* puk, int puk_len, const char* msg, int msg_len, const
     
     return ret;
 }
+
+int rsa_generate_key(int bits, char* pvk, int* pvk_len, char* puk, int * puk_len)
+{
+    int ret = -1;
+    RSA *rsa = RSA_new();
+
+    BIGNUM *e = BN_new();
+    BN_set_word(e, 65537);
+    
+    if (bits % 8 !=0 ) return -1;
+
+    if (pvk == NULL || puk == NULL) return -2;
+
+    ret = RSA_generate_key_ex(rsa, bits, e, NULL);
+
+    /* To get the C-string PEM form: */
+    BIO *bio = BIO_new(BIO_s_mem());
+    BIO *bio2 = BIO_new(BIO_s_mem());
+    
+    PEM_write_bio_RSAPrivateKey(bio, rsa, NULL, NULL, 0, NULL, NULL);
+
+    *pvk_len = BIO_pending(bio);
+    
+    BIO_read(bio, pvk, *pvk_len);
+
+    PEM_write_bio_RSAPublicKey(bio, rsa);
+
+    *puk_len = BIO_pending(bio);
+    BIO_read(bio, puk, *puk_len);
+    
+    BIO_free_all(bio);
+    BIO_free_all(bio2);
+    
+    RSA_free(rsa);
+    
+    return 0;
+}
