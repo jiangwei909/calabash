@@ -265,14 +265,12 @@ int rsa_generate_key(int bits, char* pvk, int* pvk_len, char* puk, int * puk_len
     return 0;
 }
 
-int rsa_encode_puk_to_pem_str(const char* puk, int * puk_len, char* str)
+int rsa_encode_puk_to_pem_str(const char* puk, int puk_len, char* str)
 {
     int str_len;
     int ret = -1;
     
-    const unsigned char **u_puk = (const unsigned char**)&puk;
-
-    EVP_PKEY* pkey = d2i_PublicKey(EVP_PKEY_RSA, NULL, u_puk, puk_len);
+    EVP_PKEY* pkey = d2i_PublicKey(EVP_PKEY_RSA, NULL, &puk, puk_len);
 
     if (pkey == NULL) return -1;
     
