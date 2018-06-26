@@ -221,6 +221,7 @@ int rsa_encode_puk_to_pem_str(const char* puk, int puk_len, char* str);
 int rsa_encode_pvk_to_pem_str(const char* pvk, int pvk_len, char* str);
 
 int rsa_encode_puk_to_pem_file(const char* puk, int puk_len, char* file_name);
+int rsa_encode_pvk_to_pem_file(const char* pvk, int pvk_len, char* file_name);
 
 int rsa_encrypt(const char* puk, int puk_len, const char* plain, int plain_len, char* cipher);
 
