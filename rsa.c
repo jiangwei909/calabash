@@ -311,3 +311,23 @@ int rsa_encode_pvk_to_pem_str(const char* pvk, int pvk_len, char* str)
     return ret;
 }
 
+int rsa_encode_puk_to_pem_file(const char* puk, int puk_len, char* file_name)
+{
+    int str_len;
+    int ret = -1;
+    
+    EVP_PKEY* pkey = d2i_PublicKey(EVP_PKEY_RSA, NULL, &puk, puk_len);
+
+    if (pkey == NULL) return -1;
+    
+    RSA* rsa = EVP_PKEY_get1_RSA(pkey);
+
+    BIO *bio = BIO_new_file(file_name, "w");
+    if (bio == NULL) return -2;
+    
+    ret = PEM_write_bio_RSAPublicKey(bio, rsa);
+    
+    BIO_free_all(bio);
+    
+    return ret;
+}

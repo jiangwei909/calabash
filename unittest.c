@@ -929,18 +929,18 @@ void test_rsa_encode_pvk_to_pem_str()
     char str[4096] =  { 0x0 };
 
     char* expected_pvk = "-----BEGIN RSA PRIVATE KEY-----\n\
-MIICWwIBAAKBgQDPMxgMJ8M3ONFMpWEixJBv4/etQHHJKa1YRkZYC2zfZAhFbbd0\n\ 
-EmylTEfGEeDqLhO7FX2oh4gJZbR6hBjgskhgG6zqvOqMEuLVn2VIPl5INWg1+caD\n\ 
-MbkNuAvabGJwXH0wdd0NWfycpKdgm6U4RbQqeJso12LS5C1LruCSgyCTVQIDAQAB\n\ 
-AoGAezc6PLhEqgk6xiau7hsQfcmGl1v0jpkfQZiA6ojY1LvLA2asqvTt8Rq8r/gf\n\ 
-1YNTLnUoRdlbN6NowVbe6Hh8+sBuO5R5NPz/TCQXOXtvzlU0XTStuVhiVeesIwtN\n\ 
-aj6/ZLchJrfAEy01ByXSPfMXNB8p1VvMYDdAVNkPRQSo8v0CQQDme4ruEGshOVzp\n\ 
-OP1Wy9vh8Sls3P90x4zj0sYVupj5INxOpYeBG4S/eSIa6pKW4jQLyR00ndjusY1A\n\ 
-YV9z/ub/AkEA5iOm+zR6OUcycbf9qoIF0np7UulUnSWJxoOQMACvcW7edZGRIE7h\n\ 
-2mTBSs+hBFfN1BLKCYE/OKGPFrt8axK5qwJAFEcuU/+xzTyExigzcd2BvQFAyckv\n\ 
-2JBt/uVedC70ooaXm3vIzj0jks0PiRq2Rvwj5B2Pqj9xBJ8udEmc4lG89QJANUKk\n\ 
-/1fqvVzDyNua4h4LOOXNqqeDRIcOdpm2AdX2xFqzMyRIIOEAlelhbm3UxsuHQABF\n\ 
-L6PwvKtvEQS8y47e1wJAbj7XBbDn+G75obfYawjkgDsJUND6PFT9cdYJ8eT4VLXc\n\ 
+MIICWwIBAAKBgQDPMxgMJ8M3ONFMpWEixJBv4/etQHHJKa1YRkZYC2zfZAhFbbd0\n\
+EmylTEfGEeDqLhO7FX2oh4gJZbR6hBjgskhgG6zqvOqMEuLVn2VIPl5INWg1+caD\n\
+MbkNuAvabGJwXH0wdd0NWfycpKdgm6U4RbQqeJso12LS5C1LruCSgyCTVQIDAQAB\n\
+AoGAezc6PLhEqgk6xiau7hsQfcmGl1v0jpkfQZiA6ojY1LvLA2asqvTt8Rq8r/gf\n\
+1YNTLnUoRdlbN6NowVbe6Hh8+sBuO5R5NPz/TCQXOXtvzlU0XTStuVhiVeesIwtN\n\
+aj6/ZLchJrfAEy01ByXSPfMXNB8p1VvMYDdAVNkPRQSo8v0CQQDme4ruEGshOVzp\n\
+OP1Wy9vh8Sls3P90x4zj0sYVupj5INxOpYeBG4S/eSIa6pKW4jQLyR00ndjusY1A\n\
+YV9z/ub/AkEA5iOm+zR6OUcycbf9qoIF0np7UulUnSWJxoOQMACvcW7edZGRIE7h\n\
+2mTBSs+hBFfN1BLKCYE/OKGPFrt8axK5qwJAFEcuU/+xzTyExigzcd2BvQFAyckv\n\
+2JBt/uVedC70ooaXm3vIzj0jks0PiRq2Rvwj5B2Pqj9xBJ8udEmc4lG89QJANUKk\n\
+/1fqvVzDyNua4h4LOOXNqqeDRIcOdpm2AdX2xFqzMyRIIOEAlelhbm3UxsuHQABF\n\
+L6PwvKtvEQS8y47e1wJAbj7XBbDn+G75obfYawjkgDsJUND6PFT9cdYJ8eT4VLXc\n\
 hpYqE3n8wut+m4sA5njvh/V6vKnu8/ESlV0AxVxtuA==\n\
 -----END RSA PRIVATE KEY-----\n";
     
@@ -950,6 +950,38 @@ hpYqE3n8wut+m4sA5njvh/V6vKnu8/ESlV0AxVxtuA==\n\
     
     TEST_ASSERT_NOT_EQUAL(-1, ret);
     TEST_ASSERT_EQUAL_STRING(expected_pvk, str);
+}
+
+
+void test_rsa_encode_puk_to_pem_file()
+{
+    char* puk_hex = "30818902818100B378DC5DAE48CB55729F64095054F4F906C520BFC7F5EAAE0D50EE15CBA83B844CDBA02DA71B0D51CADD4466968BAAA9E4CF27C258E0DF8850F0D062385C1A67C2268281326D71200137631F3C031D56C69077BB3F03F2F677A32A0523A4A143B08C9BC1AE581721CC5735FFD416A1AC1E78A7B1D067B007DACCCEB96427CD2B0203010001";
+
+    char puk[256] = { 0x0 };
+    int puk_len;
+    char *file_name = "_t_puk.pem";
+    char buff[1024] = { 0x0 };
+    
+    char* expected_puk = "-----BEGIN RSA PUBLIC KEY-----\n\
+MIGJAoGBALN43F2uSMtVcp9kCVBU9PkGxSC/x/Xqrg1Q7hXLqDuETNugLacbDVHK\n\
+3URmlouqqeTPJ8JY4N+IUPDQYjhcGmfCJoKBMm1xIAE3Yx88Ax1WxpB3uz8D8vZ3\n\
+oyoFI6ShQ7CMm8GuWBchzFc1/9QWoaweeKex0GewB9rMzrlkJ80rAgMBAAE=\n\
+-----END RSA PUBLIC KEY-----\n";
+        
+    hex_to_bin(puk_hex, strlen(puk_hex), puk, &puk_len);
+    
+    int ret = rsa_encode_puk_to_pem_file(puk, puk_len, file_name);
+
+    TEST_ASSERT_NOT_EQUAL(-1, ret);
+
+    FILE* fp = fopen(file_name, "r");
+    if (fp == NULL) TEST_ASSERT_EQUAL(0, -1);
+
+    int r = fread(buff, 1, 1024, fp);
+    fclose(fp);
+
+    TEST_ASSERT_EQUAL_STRING(expected_puk, buff);
+    remove(file_name);
 }
 
 int main(int argc, char* argv[]) {
@@ -994,6 +1026,8 @@ int main(int argc, char* argv[]) {
     RUN_TEST(test_rsa_generate_key);
     RUN_TEST(test_rsa_encode_puk_to_pem_str);
     RUN_TEST(test_rsa_encode_pvk_to_pem_str);
-    
+
+    RUN_TEST(test_rsa_encode_puk_to_pem_file);
+	
     return UNITY_END();
 }
