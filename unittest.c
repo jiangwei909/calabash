@@ -642,7 +642,7 @@ void test_des_ecb_decrypt()
 
 }
 
-void test_rsa_read_puk_from_pemfile()
+void test_rsa_read_key_from_pem_file()
 {
     char* pemfile = "rsa_publickey.pem";
     int ret = -1;
@@ -652,7 +652,7 @@ void test_rsa_read_puk_from_pemfile()
     int pvk_hex_len = 0;
     char* expected_pvk = "30819F300D06092A864886F70D010101050003818D0030818902818100A6D36FD33D75DDDACC3A7E978C187FC0FC57FEA133C7AA37438BEAC509874B1C621536D5F746D69E527A4E0A4B487A22E29BC2CC8D42C0AF7DE0E086CE0016452DF90CF5F470E6AAA2838F6AD4D1FCE4AB6153D850764E6B7BAF5037DA9A186B0D2763CFF843819C5AE9F149DBFCCBB33CAE9733CD040208E4690299C8A968550203010001";
     
-    pvk_len = rsa_read_puk_from_pem_file(pemfile, pvk);
+    pvk_len = rsa_read_key_from_pem_file(pemfile, pvk);
 
     TEST_ASSERT_EQUAL_INT(162, pvk_len);
     
@@ -660,7 +660,7 @@ void test_rsa_read_puk_from_pemfile()
     TEST_ASSERT_EQUAL_STRING(expected_pvk, pvk_hex);
 }
 
-void test_rsa_decode_key_from_pem_str()
+void test_rsa_read_key_from_pem_str()
 {
     char* pem_str = "-----BEGIN PUBLIC KEY-----\n\
 MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCm02/TPXXd2sw6fpeMGH/A/Ff+\n\
@@ -682,7 +682,7 @@ M80EAgjkaQKZyKloVQIDAQAB \n\
     int s = fread(pem_str, 1, 1024, fp);
     fclose(fp);
 */  
-    pvk_len = rsa_decode_key_from_pem_str(pem_str, strlen(pem_str), pvk);
+    pvk_len = rsa_read_key_from_pem_str(pem_str, strlen(pem_str), pvk);
 
     TEST_ASSERT_EQUAL_INT(162, pvk_len);
     
@@ -1055,8 +1055,8 @@ int main(int argc, char* argv[]) {
     RUN_TEST(test_des_ecb_encrypt);
     RUN_TEST(test_des_ecb_decrypt);
 
-    RUN_TEST(test_rsa_read_puk_from_pemfile);
-    RUN_TEST(test_rsa_decode_key_from_pem_str);
+    RUN_TEST(test_rsa_read_key_from_pem_file);
+    RUN_TEST(test_rsa_read_key_from_pem_str);
     RUN_TEST(test_rsa_encrypt);
     RUN_TEST(test_rsa_decrypt);
     RUN_TEST(test_rsa_sign);

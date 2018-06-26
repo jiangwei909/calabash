@@ -21,7 +21,7 @@
 #include "calabash.h"
 #include "internal.h"
 
-int rsa_read_puk_from_pem_file(const char* pemfile, char* puk)
+int rsa_read_key_from_pem_file(const char* pemfile, char* puk)
 {
     BIO *fp;
     char *name = 0;
@@ -49,19 +49,20 @@ int rsa_read_puk_from_pem_file(const char* pemfile, char* puk)
 
     ret = PEM_read_bio(fp, &name, &header, &buff, &buff_len);
 
-    if (strncmp(name, "PUBLIC KEY", 10) == 0) {
+    if (ret > 0) {
 	memcpy(puk, buff, buff_len);
 	ret = buff_len;
     } else {
-	printf("WARNING: This is not a valid pem key file.\n");
+	printf("WARNING: This is not a valid pem file.\n");
 	ret = -3;
     }
+
 
     BIO_free(fp);
     return ret;
 }
 
-int rsa_decode_key_from_pem_str(const char* pem_str, int pem_str_len, char* puk)
+int rsa_read_key_from_pem_str(const char* pem_str, int pem_str_len, char* puk)
 {
     BIO *fp;
     char *name = 0;
