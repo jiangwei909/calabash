@@ -266,7 +266,7 @@ int rsa_generate_key(int bits, char* pvk, int* pvk_len, char* puk, int * puk_len
     return 0;
 }
 
-int rsa_encode_puk_to_pem_str(const char* puk, int puk_len, char* str)
+int rsa_dump_puk_to_pem_str(const char* puk, int puk_len, char* str)
 {
     int str_len;
     int ret = -1;
@@ -289,7 +289,7 @@ int rsa_encode_puk_to_pem_str(const char* puk, int puk_len, char* str)
     return ret;
 }
 
-int rsa_encode_pvk_to_pem_str(const char* pvk, int pvk_len, char* str)
+int rsa_dump_pvk_to_pem_str(const char* pvk, int pvk_len, char* str)
 {
     int ret = -1;
     
@@ -312,7 +312,7 @@ int rsa_encode_pvk_to_pem_str(const char* pvk, int pvk_len, char* str)
     return ret;
 }
 
-int rsa_encode_puk_to_pem_file(const char* puk, int puk_len, char* file_name)
+int rsa_dump_puk_to_pem_file(const char* puk, int puk_len, char* file_name)
 {
     int str_len;
     int ret = -1;
@@ -333,7 +333,7 @@ int rsa_encode_puk_to_pem_file(const char* puk, int puk_len, char* file_name)
     return ret;
 }
 
-int rsa_encode_pvk_to_pem_file(const char* pvk, int pvk_len, char* file_name)
+int rsa_dump_pvk_to_pem_file(const char* pvk, int pvk_len, char* file_name)
 {
     
     int ret = -1;
