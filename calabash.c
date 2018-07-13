@@ -111,77 +111,65 @@ int sm2_uncompress_public_key(const char *in, int in_len, char *out, int *out_le
         return -1;
     }
 
-    do
-    {
-        if (in[0] == 0x03)
-        {
-            y_chooser_bit = 1;
-        }
-        else
-        {
-            y_chooser_bit = 0;
-        }
+    if (in[0] == 0x03) {
+	y_chooser_bit = 1;
+    } else if (in[0] == 0x02){
+	y_chooser_bit = 0;
+    } else {
+	return -2;
+    }
 
-        memcpy(x_compressed_byte_array, in, 33);
-        x_compressed = BN_new();
+    memcpy(x_compressed_byte_array, in, 33);
+    x_compressed = BN_new();
 
-        if (x_compressed == NULL)
-        {
-            results = -1;
-            break;
-        }
-        curve_group = EC_GROUP_new_by_curve_name(NID_sm2p256v1);
-        if (curve_group == NULL)
-        {
-            results = -2;
-            break;
-        }
+    if (x_compressed == NULL) {
+	results = -1;
+	goto end;
+    }
 
-        // create a big number from the unsigned char array
-        BN_bin2bn(&x_compressed_byte_array[1], sizeof(x_compressed_byte_array) - 1, x_compressed);
-        point = EC_POINT_new(curve_group);
-        if (point == NULL)
-        {
-            results = -3;
-            break;
-        }
-        //说明：素数域椭圆曲线，给定压缩坐标x和y_bit参数，设置point的几何坐标；用于将Octet-String转化为椭圆曲线上的点；
-        EC_POINT_set_compressed_coordinates_GFp(curve_group, point,
-                                                x_compressed,
-                                                y_chooser_bit, NULL);
+    curve_group = EC_GROUP_new_by_curve_name(NID_sm2p256v1);
+    if (curve_group == NULL) {
+	results = -2;
+	goto end;
+    }
 
-        //printf("results=%d\r\n",results);
-        if (!EC_POINT_is_on_curve(curve_group, point, NULL))
-        {
-            results = -4;
-            break;
-        }
+    // create a big number from the unsigned char array
+    BN_bin2bn(&x_compressed_byte_array[1], sizeof(x_compressed_byte_array) - 1, x_compressed);
+    point = EC_POINT_new(curve_group);
+    if (point == NULL) {
+	results = -3;
+	goto end;
+    }
+    
+    //说明：素数域椭圆曲线，给定压缩坐标x和y_bit参数，设置point的几何坐标；用于将Octet-String转化为椭圆曲线上的点；
+    EC_POINT_set_compressed_coordinates_GFp(curve_group, point,
+					    x_compressed,
+					    y_chooser_bit, NULL);
 
-        returnsize = EC_POINT_point2oct(curve_group, point,
-                                        POINT_CONVERSION_UNCOMPRESSED,
-                                        &xy[0], sizeof(xy), NULL); // 49
+    if (!EC_POINT_is_on_curve(curve_group, point, NULL)) {
+	results = -4;
+	goto end;
+    }
+    
+    returnsize = EC_POINT_point2oct(curve_group, point,
+				    POINT_CONVERSION_UNCOMPRESSED,
+				    &xy[0], sizeof(xy), NULL); // 49
+    
+    if (returnsize != 65) {
+	results = -5;
+	goto end;
+    }
 
-        if (returnsize != 65)
-        {
-            results = -5;
-            break;
-        }
-        //printf("returnsize=%d\r\n",returnsize);
-    } while (0);
-
-    // clean up allocated memory
-    if (x_compressed)
-        BN_free(x_compressed);
-    if (point)
-        EC_POINT_free(point);
-    if (curve_group)
-        EC_GROUP_free(curve_group);
-
-    if (0 == results)
-    {
+  end:
+    BN_free(x_compressed);
+    EC_POINT_free(point);
+    EC_GROUP_free(curve_group);
+    
+    if (0 == results) {
         memcpy(out, xy, 65);
         *out_len = 65;
     }
+    
     return results;
 }
 
@@ -290,7 +278,7 @@ int sm2_sign(const char *pvk, int pvk_len, const char *data, int data_len, char 
 {
     EVP_PKEY *pkey = NULL;
     EC_KEY *ec_key = NULL;
-    EC_GROUP *group;
+    EC_GROUP *group = NULL;
 
     const EVP_MD *id_md = EVP_sm3();
     const EVP_MD *msg_md = EVP_sm3();
@@ -394,30 +382,12 @@ int sm2_sign_verify(const unsigned char *puk, int puk_len, const unsigned char *
     unsigned char *pp_sig = NULL;
     int pp_len = 0;
     unsigned char *tp = NULL;
+    int puk_offset = 0;
 
-#ifdef DEBUG
-    printf("puk[%d] = ", puk_len);
-    for (i = 0; i < puk_len; i++)
-    {
-        printf("%02X", puk[i] & 0xff);
+    if (puk_len == 65 && puk[0] == 0x04) {
+	puk_offset = 1;
     }
-    printf("\n");
-
-    printf("data[%d] = ", data_len);
-    for (i = 0; i < data_len; i++)
-    {
-        printf("%02X", data[i] & 0xff);
-    }
-    printf("\n");
-
-    printf("sign[%d] = ", sig_len);
-    for (i = 0; i < sig_len; i++)
-    {
-        printf("%02X", signature[i] & 0xff);
-    }
-    printf("\n");
-#endif
-
+    
     group = EC_GROUP_new_by_curve_name(NID_sm2p256v1);
 
     if (!(ec_key = EC_KEY_new()))
@@ -432,12 +402,12 @@ int sm2_sign_verify(const unsigned char *puk, int puk_len, const unsigned char *
         goto end;
     }
 
-    if ((x = BN_bin2bn(puk, 32, NULL)) == NULL)
+    if ((x = BN_bin2bn(puk + puk_offset, 32, NULL)) == NULL)
     {
         ret = -4;
         goto end;
     }
-    if ((y = BN_bin2bn(puk + 32, 32, NULL)) == NULL)
+    if ((y = BN_bin2bn(puk + puk_offset + 32, 32, NULL)) == NULL)
     {
         ret = -5;
         goto end;
@@ -452,39 +422,6 @@ int sm2_sign_verify(const unsigned char *puk, int puk_len, const unsigned char *
     ret = SM2_compute_message_digest(id_md, msg_md,
                                      data, data_len, id, strlen(id),
                                      dgst, &dgstlen, ec_key);
-#ifdef DEBUG
-    printf("ret = [%d] = ", ret);
-    ret = EVP_MD_size(msg_md);
-    printf("EVP_MD_size = [%d] = ", ret);
-
-    printf("dgst[%d] = ", dgstlen);
-    for (i = 0; i < dgstlen; i++)
-    {
-        printf("%02X", dgst[i] & 0xff);
-    }
-    printf("\n");
-
-    printf("id_md [%d] = ", 64);
-    for (i = 0; i < 64; i++)
-    {
-        printf("%02X", ((unsigned char *)id_md)[i] & 0xff);
-    }
-    printf("\n");
-
-    printf("msg_md[%d] = ", 64);
-    for (i = 0; i < 64; i++)
-    {
-        printf("%02X", ((unsigned char *)msg_md)[i] & 0xff);
-    }
-    printf("\n");
-
-    printf("ec_key[%d] = ", 64);
-    for (i = 0; i < 64; i++)
-    {
-        printf("%02X", ((unsigned char *)ec_key)[i] & 0xff);
-    }
-    printf("\n");
-#endif
 
     if ((r = BN_bin2bn(signature, 32, NULL)) == NULL)
     {
@@ -516,14 +453,7 @@ int sm2_sign_verify(const unsigned char *puk, int puk_len, const unsigned char *
     pp = pp_sig;
 
     pp_len = i2d_ECDSA_SIG(sig, &pp);
-#ifdef DEBUG
-    printf("sig = ");
-    for (i = 0; i < pp_len; i++)
-    {
-        printf("%02X", pp_sig[i]);
-    }
-    printf("\n");
-#endif
+    
     ret = SM2_verify(type, dgst, dgstlen, pp_sig, pp_len, ec_key);
 
     if (1 != ret)
@@ -629,6 +559,34 @@ int sm2_read_puk_from_pemfile(const char* pemfile, char* puk, int* puk_len)
     return 0;
 }
 
+int sm2_read_puk_from_pem_str(const char* pem_str, int pem_str_len, char* puk, int* puk_len)
+{
+    BIO *fp;
+    char *name = 0;
+    char *header = 0;
+    unsigned char *buff = 0x0;
+    long buff_len = 0;
+    int ret = -1;
+
+    fp = BIO_new_mem_buf(pem_str, pem_str_len);
+    if (fp == NULL) return -1;
+    
+    ret = PEM_read_bio(fp, &name, &header, &buff, &buff_len);
+    
+    if (ret && strncmp(name, "PUBLIC KEY", 10) == 0) {
+	memcpy(puk, buff + (buff_len - 64), 64);
+	*puk_len = 64;
+	ret = 0;
+    } else {
+	printf("WARNING: This is not a valid pem string.\n");
+	ret = -3;
+    }
+
+    BIO_free(fp);
+    return 0;
+}
+
+
 int sm2_get_puk_from_pvk(const char* pvk, int pvk_len, char* puk, int* puk_len)
 {
     EC_KEY* ec_key = NULL;
@@ -718,7 +676,9 @@ int sm2_encrypt(const char* puk, int puk_len, const char* plain, int plain_len, 
         goto end;
     }
 
-    if (puk_len == 65) offset = 1;
+    if (puk_len == 65 && puk[0] == 0x04) {
+	offset = 1;
+    }
     
     if ((x = BN_bin2bn(puk + offset, 32, NULL)) == NULL)
     {

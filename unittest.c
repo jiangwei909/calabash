@@ -50,6 +50,29 @@ void test_sm2_read_puk_from_pemfile()
     TEST_ASSERT_EQUAL_STRING(expected_pvk, pvk_hex);
 }
 
+void test_sm2_read_puk_from_pem_str()
+{
+    char* pem_str = "-----BEGIN PUBLIC KEY-----\n\
+MFkwEwYHKoZIzj0CAQYIKoEcz1UBgi0DQgAEkvd1vCK1W4zL0ri+eOn2TWqnQoPD\n\
+pRJ/ilDe4QdFan/ijioVwhlAj+BRR6jJaP2I16iBeVMPHYNjksAKS0hNzQ==\n\
+-----END PUBLIC KEY-----";
+    int ret = -1;
+    char pvk[64] = { 0x0 };
+    int pvk_len = 0;
+    char pvk_hex[128] = { 0x0 };
+    int pvk_hex_len = 0;
+    char* expected_pvk = "92F775BC22B55B8CCBD2B8BE78E9F64D6AA74283C3A5127F8A50DEE107456A7FE28E2A15C219408FE05147A8C968FD88D7A88179530F1D836392C00A4B484DCD";
+    
+    ret = sm2_read_puk_from_pem_str(pem_str, strlen(pem_str), pvk, &pvk_len);
+    
+    TEST_ASSERT_EQUAL_INT(0, ret);
+    TEST_ASSERT_EQUAL_INT(64, pvk_len);
+    
+    bin_to_hex(pvk, pvk_len, pvk_hex, &pvk_hex_len);
+    TEST_ASSERT_EQUAL_STRING(expected_pvk, pvk_hex);
+}
+
+
 void test_sm2_compress_public_key()
 {
     char *puk = "81bf68edf30e4ff2d57545703999d1df6edee63a1fc5f46c8fd768f2a4c2308bb328f1038af1295cbb1a4b29fc2e2ea0e05562e5058d8a94a703f03f9996327d";
@@ -1160,6 +1183,8 @@ int main(int argc, char* argv[]) {
 
     RUN_TEST(test_sm2_read_pvk_from_pemfile);
     RUN_TEST(test_sm2_read_puk_from_pemfile);
+    RUN_TEST(test_sm2_read_puk_from_pem_str);
+    
     RUN_TEST(test_sm2_compress_public_key);
     RUN_TEST(test_uncompress_public_key);
     RUN_TEST(test_sm2_sign_with_pem);
