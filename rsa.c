@@ -289,6 +289,27 @@ int rsa_dump_puk_to_pem_str(const char* puk, int puk_len, char* str)
     return ret;
 }
 
+int rsa_dump_puk_to_pkcs8_pem_str(const char* puk, int puk_len, char* str)
+{
+    int str_len;
+    int ret = -1;
+    
+    EVP_PKEY* pkey = d2i_PublicKey(EVP_PKEY_RSA, NULL, &puk, puk_len);
+
+    if (pkey == NULL) return -1;
+    
+    BIO *bio = BIO_new(BIO_s_mem());
+    PEM_write_bio_PUBKEY(bio, pkey);
+
+    str_len = BIO_pending(bio);
+    BIO_read(bio, str, str_len);
+    ret = str_len;
+    
+    BIO_free_all(bio);
+    
+    return ret;
+}
+
 int rsa_dump_pvk_to_pem_str(const char* pvk, int pvk_len, char* str)
 {
     int ret = -1;
@@ -327,6 +348,25 @@ int rsa_dump_puk_to_pem_file(const char* puk, int puk_len, char* file_name)
     if (bio == NULL) return -2;
     
     ret = PEM_write_bio_RSAPublicKey(bio, rsa);
+    
+    BIO_free_all(bio);
+    
+    return ret;
+}
+
+int rsa_dump_puk_to_pkcs8_pem_file(const char* puk, int puk_len, char* file_name)
+{
+    int str_len;
+    int ret = -1;
+    
+    EVP_PKEY* pkey = d2i_PublicKey(EVP_PKEY_RSA, NULL, &puk, puk_len);
+
+    if (pkey == NULL) return -1;
+
+    BIO *bio = BIO_new_file(file_name, "w");
+    if (bio == NULL) return -2;
+    
+    ret = PEM_write_bio_PUBKEY(bio, pkey);
     
     BIO_free_all(bio);
     
