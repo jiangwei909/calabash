@@ -336,13 +336,20 @@ int rsa_dump_pvk_to_pem_str(const char* pvk, int pvk_len, char* str)
 int rsa_dump_pvk_to_pkcs8_pem_str(const char* pvk, int pvk_len, const char* password, char* str)
 {
     int ret = -1;
+    int password_len = 0;
+    EVP_CIPHER* evp_cipher = NULL;
     
     EVP_PKEY* pkey = d2i_PrivateKey(EVP_PKEY_RSA, NULL, &pvk, pvk_len);
 
     if (pkey == NULL) return -1;
+
+    if (password != NULL) {
+	password_len = strlen(password);
+	evp_cipher = EVP_des_ede3_cbc();
+    }
     
     BIO *bio = BIO_new(BIO_s_mem());
-    PEM_write_bio_PKCS8PrivateKey(bio, pkey, NULL, NULL, 0, password, NULL);
+    PEM_write_bio_PKCS8PrivateKey(bio, pkey, evp_cipher, password, password_len, NULL, NULL);
     
     ret = BIO_pending(bio);
     
@@ -419,15 +426,20 @@ int rsa_dump_pvk_to_pkcs8_pem_file(const char* pvk, int pvk_len, const char* pas
 {
     
     int ret = -1;
+    int password_len = 0;
+    EVP_CIPHER* evp_cipher = NULL;
     
     EVP_PKEY* pkey = d2i_PrivateKey(EVP_PKEY_RSA, NULL, &pvk, pvk_len);
 
     if (pkey == NULL) return -1;
+
+    if (password != NULL) {
+	password_len = strlen(password);
+	evp_cipher = EVP_des_ede3_cbc();
+    }
     
     BIO *bio = BIO_new_file(file_name, "w");
-    if (bio == NULL) return -2;    
-
-    ret = PEM_write_bio_PKCS8PrivateKey(bio, pkey, NULL, NULL, 0, password, NULL);
+    ret = PEM_write_bio_PKCS8PrivateKey(bio, pkey, evp_cipher, password, password_len, NULL, NULL);
     
     BIO_free_all(bio);
     
