@@ -401,21 +401,27 @@ int rsa_dump_puk_to_pkcs8_pem_file(const char* puk, int puk_len, char* file_name
     return ret;
 }
 
-int rsa_dump_pvk_to_pem_file(const char* pvk, int pvk_len, char* file_name)
-{
-    
+int rsa_dump_pvk_to_pem_file(const char* pvk, int pvk_len, const char* password, char* file_name)
+{    
     int ret = -1;
-    
+    int password_len = 0;
+    EVP_CIPHER* evp_cipher = NULL;
+   
     EVP_PKEY* pkey = d2i_PrivateKey(EVP_PKEY_RSA, NULL, &pvk, pvk_len);
 
     if (pkey == NULL) return -1;
+
+    if (password != NULL) {
+	password_len = strlen(password);
+	evp_cipher = EVP_des_ede3_cbc();
+    }    
     
     RSA* rsa = EVP_PKEY_get1_RSA(pkey);
 
     BIO *bio = BIO_new_file(file_name, "w");
     if (bio == NULL) return -2;    
 
-    ret = PEM_write_bio_RSAPrivateKey(bio, rsa, NULL, NULL, 0, NULL, NULL);
+    ret = PEM_write_bio_RSAPrivateKey(bio, rsa, evp_cipher, password, password_len, NULL, NULL);
     
     BIO_free_all(bio);
     
