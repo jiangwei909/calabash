@@ -414,3 +414,22 @@ int rsa_dump_pvk_to_pem_file(const char* pvk, int pvk_len, char* file_name)
     
     return ret;
 }
+
+int rsa_dump_pvk_to_pkcs8_pem_file(const char* pvk, int pvk_len, const char* password, char* file_name)
+{
+    
+    int ret = -1;
+    
+    EVP_PKEY* pkey = d2i_PrivateKey(EVP_PKEY_RSA, NULL, &pvk, pvk_len);
+
+    if (pkey == NULL) return -1;
+    
+    BIO *bio = BIO_new_file(file_name, "w");
+    if (bio == NULL) return -2;    
+
+    ret = PEM_write_bio_PKCS8PrivateKey(bio, pkey, NULL, NULL, 0, password, NULL);
+    
+    BIO_free_all(bio);
+    
+    return ret;
+}

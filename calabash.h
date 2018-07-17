@@ -399,6 +399,17 @@ int rsa_dump_puk_to_pcks8_pem_file(const char* puk, int puk_len, char* file_name
 int rsa_dump_pvk_to_pem_file(const char* pvk, int pvk_len, char* file_name);
 
 /**
+ * @brief 把RSA私钥转换保存为PKCS#8的PEM文件
+ * @details 把RSA私钥转换保存成PCKS#8的PEM文件
+ * 
+ * @param pvk 待转换的RSA私钥
+ * @param pvk_len 待转换的RSA私钥长度
+ * @param file_name PEM文件
+ * @return 成功返回PEM文件的长度，负数表示失败
+ */
+int rsa_dump_pvk_to_pkcs8_pem_file(const char* pvk, int pvk_len, const char* password, char* file_name);
+
+/**
  * @brief 使用RSA公钥加密数据
  * @details 使用RSA公钥加密数据
  * 
