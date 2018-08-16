@@ -451,3 +451,16 @@ int rsa_dump_pvk_to_pkcs8_pem_file(const char* pvk, int pvk_len, const char* pas
     
     return ret;
 }
+
+int rsa_transfer_key_pkcs8_to_pkcs1(const char* pkcs8_key, int pkcs8_key_len, char* pkcs1_key)
+{
+
+    char pem_str[2048] = { 0x0 };
+    int pkcs1_key_len = 0;
+
+    memcpy(pkcs1_key, pkcs8_key + 22, pkcs8_key_len - 22);
+    
+    pkcs1_key_len = pkcs8_key_len - 22;
+    
+    return pkcs1_key_len;    
+}

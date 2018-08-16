@@ -1384,6 +1384,27 @@ void test_rsa_dump_pvk_to_pkcs8_pem_file_with_password()
     remove(file_name);
 }
 
+void test_rsa_transfer_key_pkcs8_to_pkcs1()
+{
+    char *pkcs8_key_hex ="30819F300D06092A864886F70D010101050003818D0030818902818100A6D36FD33D75DDDACC3A7E978C187FC0FC57FEA133C7AA37438BEAC509874B1C621536D5F746D69E527A4E0A4B487A22E29BC2CC8D42C0AF7DE0E086CE0016452DF90CF5F470E6AAA2838F6AD4D1FCE4AB6153D850764E6B7BAF5037DA9A186B0D2763CFF843819C5AE9F149DBFCCBB33CAE9733CD040208E4690299C8A968550203010001";
+    char *expected_pkcs1_key_hex = "30818902818100A6D36FD33D75DDDACC3A7E978C187FC0FC57FEA133C7AA37438BEAC509874B1C621536D5F746D69E527A4E0A4B487A22E29BC2CC8D42C0AF7DE0E086CE0016452DF90CF5F470E6AAA2838F6AD4D1FCE4AB6153D850764E6B7BAF5037DA9A186B0D2763CFF843819C5AE9F149DBFCCBB33CAE9733CD040208E4690299C8A968550203010001";
+    
+    char pkcs8_bin[1024] = { 0x0 };
+    int pkcs8_bin_len = 0;
+
+    char pkcs1_key[1024] = { 0x0 };
+
+    char pkcs1_key_hex[512] = { 0x0 };
+    int pkcs1_key_hex_len = 0;
+
+    hex_to_bin(pkcs8_key_hex, strlen(pkcs8_key_hex), pkcs8_bin, &pkcs8_bin_len);
+    
+    int pkcs1_key_len = rsa_transfer_key_pkcs8_to_pkcs1(pkcs8_bin, pkcs8_bin_len, pkcs1_key);
+
+    bin_to_hex(pkcs1_key, pkcs1_key_len, pkcs1_key_hex, &pkcs1_key_hex_len);
+
+    TEST_ASSERT_EQUAL_STRING(expected_pkcs1_key_hex, pkcs1_key_hex);
+}
 
 int main(int argc, char* argv[]) {
 
@@ -1445,6 +1466,8 @@ int main(int argc, char* argv[]) {
     RUN_TEST(test_rsa_dump_pvk_to_pem_file_with_password);
     RUN_TEST(test_rsa_dump_pvk_to_pkcs8_pem_file);
     RUN_TEST(test_rsa_dump_pvk_to_pkcs8_pem_file_with_password);
+
+    RUN_TEST(test_rsa_transfer_key_pkcs8_to_pkcs1);
     
     return UNITY_END();
 }

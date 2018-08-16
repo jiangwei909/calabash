@@ -305,6 +305,18 @@ int rsa_read_key_from_pem_file(const char* pem_file, char* puk);
  */
 int rsa_read_key_from_pem_str(const char* pem_str, int pem_str_len, char* puk);
 
+
+/**
+ * @brief 把DER格式的公钥由PKCS8转换成PKCS1
+ * @details 把DER格式的公钥由PKCS8转换成PKCS1
+ * 
+ * @param pcks8_key PKCS#8格式的公钥
+ * @param pcks8_key_len PKCS#8格式的公钥长度
+ * @param pcks1_key PKCS#1格式的公钥
+ * @return 返回密钥长度，负数表示失败
+ */
+int rsa_transfer_key_pkcs8_to_pkcs1(const char* pcks8_key, int pcks8_key_len, char* pcks1_key);
+
 /**
  * @brief 生成RSA密钥对
  * @details 生成RSA密钥对
