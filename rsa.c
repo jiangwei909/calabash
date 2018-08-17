@@ -89,9 +89,32 @@ int rsa_read_key_from_pem_str(const char* pem_str, int pem_str_len, char* puk)
 
 int rsa_encrypt(const char* puk, int puk_len, const char* plain, int plain_len, char* cipher)
 {
-    const unsigned char **u_puk = (const unsigned char**)&puk;
+    
+    int pkcs = 1;
+    int offset = 0;
+    
+    for(int i = 0; i< puk_len;) {
+	if (puk[i] == 0x30 && puk[i+1] == 0x0D && puk[i+2] == 0x06 && puk[i+3] == 0x09 && i < 10) {
+	    pkcs = 8;
+	    i += 14;
+	    continue;
+	}
 
-    EVP_PKEY* pkey = d2i_PublicKey(EVP_PKEY_RSA, NULL, u_puk, puk_len);
+	if (pkcs == 8 && puk[i] == 0x30) {
+	    offset = i;
+	    puk_len -= offset;
+	    break;
+	}
+	i += 1;
+    }
+    
+    //const unsigned char **u_puk = (const unsigned char**)(&puk+offset);
+    const unsigned char u_puk[1024] = { 0x0 };
+    memcpy(u_puk, puk + offset, puk_len); 
+
+    const unsigned char **uu_puk = (const unsigned char**)&u_puk;
+    
+    EVP_PKEY* pkey = d2i_PublicKey(EVP_PKEY_RSA, NULL, &uu_puk, puk_len);
 
     if (pkey == NULL) return -1;
     
