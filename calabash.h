@@ -5,6 +5,14 @@
 #ifndef CALABASH_H
 #define CALABASH_H
 
+#define DIGEST_NONE 	0x0
+#define DIGEST_MD5  	0x4
+#define DIGEST_SHA1 	0x64
+#define DIGEST_SHA224 	0x675
+#define DIGEST_SHA256 	0x672
+#define DIGEST_SHA384 	0x673
+#define DIGEST_SHA512 	0x674
+
 /**
  * @brief 将16进制的字符串转换为2进制字符序列
  * @details 将16进制的字符串转换为2进制字符序列,
@@ -455,10 +463,11 @@ int rsa_decrypt(const char* pvk, int pvk_len, const char* cipher, int cipher_len
  * @param pvk_len RSA私钥长度
  * @param msg 待签名的数据
  * @param msg_len 待签名的数据长度
+ * @param digest_algo 摘要算法
  * @param sign 签名值
  * @return 成功返回签名值的长度，负数表示失败
  */
-int rsa_sign(const char* pvk, int pvk_len, const char* msg, int msg_len, char* sign);
+int rsa_sign(const char* pvk, int pvk_len, const char* msg, int msg_len, int digest_algo, char* sign);
 
 /**
  * @brief 使用RSA公钥对签名进行验证
@@ -468,9 +477,10 @@ int rsa_sign(const char* pvk, int pvk_len, const char* msg, int msg_len, char* s
  * @param puk_len RSA公钥长度
  * @param msg 待验证的数据
  * @param msg_len 待验证的数据长度
+ * @param digest_algo 摘要算法
  * @param sign 待验证的签名
  * @param sign_len 待验证的签名长度
  * @return 成功返回0，否则表示失败
  */
-int rsa_verify(const char* puk, int puk_len, const char* msg, int msg_len, const char* sign, int sign_len);
+int rsa_verify(const char* puk, int puk_len, const char* msg, int msg_len, int digest_algo, const char* sign, int sign_len);
 #endif //CALABASH_H
