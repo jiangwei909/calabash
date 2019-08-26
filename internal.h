@@ -2,7 +2,7 @@
 #define INTERNAL_H
 
 /**
- *  \brief 去掉openssl中SM2加密结果中的格式信息
+ *  \brief 鍘绘帀openssl涓璖M2鍔犲瘑缁撴灉涓殑鏍煎紡淇℃伅
  *
  *  Detailed description
  *
@@ -13,7 +13,7 @@ int decode_cipher_text(const unsigned char* cipher_text, int cipher_text_len,
 				   unsigned char* no_fmt_string, int* no_fmt_string_len);
 
 /**
- *  \brief 将密文信息转换成openssl中识别的格式
+ *  \brief 灏嗗瘑鏂囦俊鎭浆鎹㈡垚openssl涓瘑鍒殑鏍煎紡
  *
  *  Detailed description
  *
