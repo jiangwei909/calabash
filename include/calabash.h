@@ -17,6 +17,7 @@
 #include "calabash/utils.h"
 #include "calabash/des.h"
 #include "calabash/rsa.h"
+#include "calabash/sm4.h"
 
 /**
  *  @brief 从pem文件读取SM2私钥
@@ -163,56 +164,5 @@ int sm2_decrypt(const char* pvk, int pvk_len, const char* cipher, int cipher_len
  *  @return 成功返回0，否则表示失败
  */
 int sm3_digest(const char* data, int data_len, char* digest);
-
-
-/**
- *  @brief SM4进行ECB加密
- *  @details SM4进行ECB加密, 待加密的数据长度必须是16的倍数，如不足，需要调用者填充到16的倍数
- *
- *  @param key 密钥的明文,必须16字节长
- *  @param plain 待加密的数据明文
- *  @param plain_len 待加密的数据明文长度
- *  @param cipher 加密后的密文
- *  @return 返回加密后密文的长度，负数表示失败
- */
-int sm4_ecb_encrypt(const char* key, const char* plain, int plain_len, char* cipher);
-
-/**
- *  @brief SM4进行ECB解密
- *  @details SM4进行ECB解密, 待解密的数据长度必须是16的倍数
- *
- *  @param key 密钥,必须16字节长
- *  @param cipher 待解密的数据密文
- *  @param cipher_len 待解密的数据密文长度
- *  @param plain 解密后的明文
- *  @return 返回解密后明文的长度，负数表示失败
- */
-int sm4_ecb_decrypt(const char* key, const char* cipher, int cipher_len, char* plain);
-
-/**
- *  @brief SM4进行CBC加密
- *  @details SM4进行CBC加密, 待加密的数据长度必须是16的倍数，如不足，需要调用者填充到16的倍数
- *
- *  @param key 密钥的明文,必须16字节长
- *  @param iv 初始化向量,必须16字节长
- *  @param plain 待加密的数据明文
- *  @param plain_len 待加密的数据明文长度
- *  @param cipher 加密后的密文
- *  @return 返回加密后密文的长度，负数表示失败
- */
-int sm4_cbc_encrypt(const char* key, const char* iv, const char* plain, int plain_len, char* cipher);
-
-/**
- *  @brief SM4进行CBC解密
- *  @details SM4进行CBC解密, 待解密的数据长度必须是16的倍数
- *
- *  @param key 密钥的明文,必须16字节长
- *  @param iv 初始化向量,必须16字节长
- *  @param cipher 待解密的数据明文
- *  @param cipher_len 待解密的数据密文长度
- *  @param plain 解密后的明文
- *  @return 返回解密后明文的长度，负数表示失败
- */
-int sm4_cbc_decrypt(const char* key, const char* iv, const char* cipher, int cipher_len, char* plain);
 
 #endif //CALABASH_H
