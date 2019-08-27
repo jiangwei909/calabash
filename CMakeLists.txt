@@ -19,14 +19,15 @@ if (OPENSSL_ROOT)
 
   if (WIN32)
     set(SSL_SUB_DIR win)
+    set (EXTRA_LIBS ${EXTRA_LIBS} libcrypto)
   else()
     set(SSL_SUB_DIR linux)
+    set (EXTRA_LIBS ${EXTRA_LIBS} crypto)
   endif(WIN32)
 
   link_directories ("${OPENSSL_ROOT}/build/${SSL_SUB_DIR}")
-  set (EXTRA_LIBS ${EXTRA_LIBS} crypto)
+  
 endif (OPENSSL_ROOT)
-
 
 add_subdirectory (test)
 
