@@ -173,43 +173,6 @@ int sm2_uncompress_public_key(const char *in, int in_len, char *out, int *out_le
     return results;
 }
 
-int hex_to_bin(const char *src, int src_len, char *dst, int *dst_len)
-{
-    char tmpbuff[4] = {0x0};
-    int i = 0;
-    int t;
-
-    if (src_len < 2 && (src_len % 2) != 0)
-    {
-        return -1;
-    }
-
-    for (i = 0; i < src_len / 2; i++)
-    {
-        memcpy(tmpbuff, src + i * 2, 2);
-        t = strtol(tmpbuff, NULL, 16);
-        *(dst + i) = t & 0xff;
-        memset(tmpbuff, 0x0, sizeof(tmpbuff));
-    }
-
-    if (dst_len != NULL) *dst_len = src_len / 2;
-    
-    return 0;
-}
-
-int bin_to_hex(const char *src, int src_len, char *dst, int *dst_len)
-{
-    int i = 0;
-
-    for (i = 0; i < src_len; i++)
-    {
-        sprintf(dst + i * 2, "%02X", *(src + i) & 0xff);
-    }
-
-    if (dst_len != NULL) *dst_len = src_len * 2;
-    
-    return 0;
-}
 
 int sm2_sign_with_pem(const unsigned char *pvk, int pvk_len, const char *data, int data_len, char *signature, int *signature_len)
 {

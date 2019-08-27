@@ -9,7 +9,7 @@
 #include <setjmp.h>
 
 #include "calabash.h"
-#include "calabash/utils.h"
+
 #include "unity/unity.h"
 
 void test_sm2_read_pvk_from_pemfile()

@@ -18,7 +18,7 @@
 #include <openssl/gmapi.h>
 #include <openssl/sms4.h>
 
-#include "calabash.h"
+#include "calabash/encode.h"
 
 int base64_to_bin(const char *src, int src_len, char *dst)
 {
@@ -83,4 +83,43 @@ int bin_to_base64(const char *src, int src_len, int newline_flag, char *dst)
     
     BIO_free_all(bio);
     return size;
+}
+
+
+int hex_to_bin(const char *src, int src_len, char *dst, int *dst_len)
+{
+    char tmpbuff[4] = {0x0};
+    int i = 0;
+    int t;
+
+    if (src_len < 2 && (src_len % 2) != 0)
+    {
+        return -1;
+    }
+
+    for (i = 0; i < src_len / 2; i++)
+    {
+        memcpy(tmpbuff, src + i * 2, 2);
+        t = strtol(tmpbuff, NULL, 16);
+        *(dst + i) = t & 0xff;
+        memset(tmpbuff, 0x0, sizeof(tmpbuff));
+    }
+
+    if (dst_len != NULL) *dst_len = src_len / 2;
+    
+    return 0;
+}
+
+int bin_to_hex(const char *src, int src_len, char *dst, int *dst_len)
+{
+    int i = 0;
+
+    for (i = 0; i < src_len; i++)
+    {
+        sprintf(dst + i * 2, "%02X", *(src + i) & 0xff);
+    }
+
+    if (dst_len != NULL) *dst_len = src_len * 2;
+    
+    return 0;
 }

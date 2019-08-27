@@ -30,7 +30,7 @@ endif (OPENSSL_ROOT)
 
 add_subdirectory (test)
 
-add_library(calabash SHARED src/calabash.c src/utils.c src/des.c src/rsa.c src/encoding.c)
+add_library(calabash SHARED src/calabash.c src/utils.c src/des.c src/rsa.c src/encode.c)
 #target_link_libraries(calabash libcrypto)
 target_link_libraries (${PROJECT_NAME}  ${EXTRA_LIBS})
 
