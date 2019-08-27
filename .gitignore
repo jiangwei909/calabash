@@ -1,0 +1,7 @@
+*~
+GPATH
+GRTAGS
+GTAGS
+build-debian
+build-win
+unittest.c.orig

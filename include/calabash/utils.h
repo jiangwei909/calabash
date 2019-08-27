@@ -1,5 +1,5 @@
-#ifndef INTERNAL_H
-#define INTERNAL_H
+#ifndef UTILS_H
+#define UTILS_H
 
 /**
  *  \brief 去掉openssl中SM2加密结果中的格式信息
@@ -23,4 +23,4 @@ int decode_cipher_text(const unsigned char* cipher_text, int cipher_text_len,
 int encode_cipher_text(const char* cipher, int cipher_len, char* encoded_cipher, int* encoded_cipher_len);
 
 
-#endif /* INTERNAL_H */
+#endif /* UTILS_H */

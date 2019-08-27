@@ -19,7 +19,7 @@
 #include <openssl/des.h>
 
 #include "calabash.h"
-#include "internal.h"
+#include "calabash/utils.h"
 
 static inline int des_ecb_crypt(const char* key, unsigned int key_len, const char* in_data, int in_data_len, char* out_data, int enc_type)
 {

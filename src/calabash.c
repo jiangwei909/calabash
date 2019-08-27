@@ -22,7 +22,7 @@
 #include <openssl/sms4.h>
 
 #include "calabash.h"
-#include "internal.h"
+#include "calabash/utils.h"
 
 int sm2_compress_public_key(const char *puk, int puk_len,
                             char *compressed_puk, int *compressed_puk_len)

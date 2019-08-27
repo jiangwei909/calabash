@@ -1,5 +1,5 @@
 #include <string.h>
-#include "internal.h"
+#include "calabash/utils.h"
 
 int encode_cipher_text(const char* cipher, int cipher_len, char* encoded_cipher, int* encoded_cipher_len)
 {

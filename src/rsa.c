@@ -19,7 +19,7 @@
 #include <openssl/sms4.h>
 
 #include "calabash.h"
-#include "internal.h"
+#include "calabash/utils.h"
 
 int rsa_read_key_from_pem_file(const char* pemfile, char* puk)
 {
