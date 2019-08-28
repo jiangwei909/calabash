@@ -11,6 +11,7 @@
 #include "calabash.h"
 
 #include "unity/unity.h"
+#include "test_keyexchange.h"
 
 void test_sm2_read_pvk_from_pemfile()
 {
@@ -1493,5 +1494,10 @@ int main(int argc, char* argv[]) {
 
     RUN_TEST(test_rsa_transfer_key_pkcs8_to_pkcs1);
     
+    RUN_TEST(test_cb_kx_keypair);
+    RUN_TEST(test_cb_kx_random_bufpair);
+    RUN_TEST(test_cb_kx_svr_session_keys);
+    RUN_TEST(test_cb_kx_clt_session_keys);
+
     return UNITY_END();
 }

@@ -19,5 +19,6 @@
 #include "calabash/rsa.h"
 #include "calabash/sm4.h"
 #include "calabash/sm2.h"
+#include "calabash/keyexchange.h"
 
 #endif //CALABASH_H
