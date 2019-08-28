@@ -1503,6 +1503,8 @@ int main(int argc, char* argv[]) {
 
     // test sm2
     RUN_TEST(test_cb_sm2_keypair);
+    RUN_TEST(test_cb_sm2_encrypt);
+    RUN_TEST(test_cb_sm2_decrypt);
 
     return UNITY_END();
 }

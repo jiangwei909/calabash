@@ -738,6 +738,58 @@ int sm2_encrypt(const char* puk, int puk_len, const char* plain, int plain_len, 
     return ret;
 }
 
+int cb_sm2_encrypt(const char* pk, const char* plain, int plain_len, char* cipher)
+{
+
+    EC_GROUP* group = NULL;
+    EC_KEY* ec_key = NULL;
+    BIGNUM* x = NULL;
+    BIGNUM* y = NULL;
+    int ret = 0;
+    int offset = 1;
+    int cipher_buffer_len = 0;
+    char cipher_buffer[256] = { 0x0 };
+    int cipher_len = 0;
+    
+    group = EC_GROUP_new_by_curve_name(NID_sm2p256v1);
+
+    if (!(ec_key = EC_KEY_new())) {
+        ret = -2;
+        goto end;
+    }
+
+    if (!EC_KEY_set_group(ec_key, group)) {
+        ret = -3;
+        goto end;
+    }
+    
+    if ((x = BN_bin2bn(pk + offset, 32, NULL)) == NULL) {
+        ret = -4;
+        goto end;
+    }
+    
+    if ((y = BN_bin2bn(pk + 32 + offset, 32, NULL)) == NULL) {
+        ret = -5;
+        goto end;
+    }
+
+    if (!EC_KEY_set_public_key_affine_coordinates(ec_key, x, y)) {
+        ret = -6;
+        goto end;
+    }
+
+    if(!SM2_encrypt(NID_sm3, plain, plain_len, cipher_buffer, &cipher_buffer_len, ec_key)) {
+	    return -1;
+    }
+
+    ret = decode_cipher_text(cipher_buffer, cipher_buffer_len, cipher, &cipher_len);
+    ret = cipher_len;
+
+  end:
+    
+    return ret;
+}
+
 int sm2_decrypt(const char* pvk, int pvk_len, const char* cipher, int cipher_len, char* plain, int* plain_len)
 {
     EC_KEY* ec_key = NULL;
@@ -767,6 +819,38 @@ int sm2_decrypt(const char* pvk, int pvk_len, const char* cipher, int cipher_len
     }
 
     return 0;
+}
+
+int cb_sm2_decrypt(const char* sk, const char* cipher, int cipher_len, char* plain)
+{
+    EC_KEY* ec_key = NULL;
+    EC_GROUP* group = NULL;
+    EC_POINT* puk_point = NULL;
+    BIGNUM* prv_bn = NULL;
+
+    char encoded_cipher[512] = { 0x0 };
+    int encoded_cipher_len = 0;
+    int ret = -1;
+    int plain_len = -1;
+
+    prv_bn = BN_bin2bn(sk, CB_SM2_SECRETKEY_BYTES, NULL);
+    ec_key = EC_KEY_new_by_curve_name(NID_sm2p256v1);
+    group = EC_KEY_get0_group(ec_key);
+    puk_point = EC_POINT_new(group);
+
+    if (!EC_KEY_set_private_key(ec_key, prv_bn))
+    {
+        printf("set private key failed.\n");
+        return -1;
+    }
+
+    ret = encode_cipher_text(cipher, cipher_len, encoded_cipher, &encoded_cipher_len);
+    
+    if(!SM2_decrypt(NID_sm3, encoded_cipher, encoded_cipher_len, plain, &plain_len, ec_key)) {
+	    return -2;
+    }
+
+    return plain_len;
 }
 
 int sm3_digest(const char* data, int data_len, char* digest)
