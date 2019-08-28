@@ -33,6 +33,8 @@ int cb_kx_random_bufpair(const char* pk, char* rnd, char* pk_rnd)
 
     int ret = cb_sm2_encrypt(pk, rnd, CB_KX_RANDOM_BYTES, pk_rnd);
 
+    cb_debug("ret=%d\n", ret);
+
     if (ret != CB_KX_PK_RANDOM_BYTES) return -1;
 
     return 0;
