@@ -110,6 +110,30 @@ int hex_to_bin(const char *src, int src_len, char *dst, int *dst_len)
     return 0;
 }
 
+int cb_hex_to_bin(const char *src, int src_len, char *dst)
+{
+    char tmpbuff[4] = {0x0};
+    int i = 0;
+    int t;
+    int dst_len = 0;
+
+    if (src_len < 2 && (src_len % 2) != 0)
+    {
+        return -1;
+    }
+
+    for (i = 0; i < src_len / 2; i++)
+    {
+        memcpy(tmpbuff, src + i * 2, 2);
+        t = strtol(tmpbuff, NULL, 16);
+        *(dst + i) = t & 0xff;
+        memset(tmpbuff, 0x0, sizeof(tmpbuff));
+    }
+
+    return src_len / 2;
+}
+
+
 int bin_to_hex(const char *src, int src_len, char *dst, int *dst_len)
 {
     int i = 0;
@@ -122,4 +146,16 @@ int bin_to_hex(const char *src, int src_len, char *dst, int *dst_len)
     if (dst_len != NULL) *dst_len = src_len * 2;
     
     return 0;
+}
+
+int cb_bin_to_hex(const char *src, int src_len, char *dst)
+{
+    int i = 0;
+
+    for (i = 0; i < src_len; i++)
+    {
+        sprintf(dst + i * 2, "%02X", *(src + i) & 0xff);
+    }
+
+    return src_len * 2;
 }

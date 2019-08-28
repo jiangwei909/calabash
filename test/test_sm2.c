@@ -26,6 +26,8 @@ void test_cb_sm2_encrypt()
 {
     char *pk = "0492F775BC22B55B8CCBD2B8BE78E9F64D6AA74283C3A5127F8A50DEE107456A7FE28E2A15C219408FE05147A8C968FD88D7A88179530F1D836392C00A4B484DCD";
     char *plain = "123456781234567812345678123456781234567812345678";
+    // char *plain = "ABCDEF0112345678";
+
     char cipher[256] = { 0x0 };
     int cipher_len = 256;
     
@@ -39,7 +41,12 @@ void test_cb_sm2_encrypt()
     hex_to_bin(pk, strlen(pk), puk_bin, &puk_bin_len);
     
     ret = cb_sm2_encrypt(puk_bin, plain, strlen(plain), cipher);
-    printf("cipher len=%d\n", ret);
+
+    //char cipher_hex[8192] = { 0x0 };
+    cb_bin_to_hex(cipher, ret, cipher_hex);
+
+    printf("cipher len=%d cipher=%s\n", ret, cipher_hex);
+
     TEST_ASSERT_EQUAL_INT(144, ret);
 
 }
