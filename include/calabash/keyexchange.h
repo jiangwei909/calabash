@@ -3,8 +3,9 @@
 
 #define CB_KX_PUBLICKEY_BYTES 65
 #define CB_KX_SECRETKEY_BYTES 32
-#define CB_KX_PK_RANDOM_BYTES 64
 #define CB_KX_RANDOM_BYTES    16
+#define CB_KX_PK_RANDOM_BYTES (CB_KX_RANDOM_BYTES + 96)
+
 
 /**
  * @brief 生成密钥对

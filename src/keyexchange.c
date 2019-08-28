@@ -29,7 +29,13 @@ int cb_kx_keypair(char* pk, char* sk)
 
 int cb_kx_random_bufpair(const char* pk, char* rnd, char* pk_rnd)
 {
-    return -1;
+    RAND_bytes(rnd, CB_KX_RANDOM_BYTES);
+
+    int ret = cb_sm2_encrypt(pk, rnd, CB_KX_RANDOM_BYTES, pk_rnd);
+
+    if (ret != CB_KX_PK_RANDOM_BYTES) return -1;
+
+    return 0;
 }
 
 int cb_kx_svr_session_keys(const char* sk, const char* rx_rnd, const char* tx_pk_rnd, char* rx, char* tx)
