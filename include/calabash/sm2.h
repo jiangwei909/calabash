@@ -13,6 +13,9 @@
 #define DIGEST_SHA384 	0x673
 #define DIGEST_SHA512 	0x674
 
+#define CB_SM2_PUBLICKEY_BYTES 65
+#define CB_SM2_SECRETKEY_BYTES 32
+
 /**
  *  @brief 从pem文件读取SM2私钥
  *  @details 从pem文件读取SM2私钥
@@ -119,6 +122,16 @@ int sm2_get_puk_from_pvk(const char* pvk, int pvk_len, char* puk, int* puk_len);
  *  @return 成功返回0，否则表示失败
  */
 int sm2_generate_keypair(char* pvk, int* pvk_len, char* puk, int* puk_len);
+
+/**
+ *  @brief 生成SM2公私密钥对
+ *  @details 生成一组SM2公私密钥对
+ * 
+ *  @param pk 生成的公钥，未经压缩，以0x04开头
+ *  @param sk 生成的私钥
+ *  @return 成功返回0，否则表示失败
+ */
+int cb_sm2_keypair(char* pk, char* sk);
 
 /**
  *  @brief 使用公钥对数据进行加密

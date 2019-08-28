@@ -12,6 +12,7 @@
 
 #include "unity/unity.h"
 #include "test_keyexchange.h"
+#include "test_sm2.h"
 
 void test_sm2_read_pvk_from_pemfile()
 {
@@ -1494,10 +1495,14 @@ int main(int argc, char* argv[]) {
 
     RUN_TEST(test_rsa_transfer_key_pkcs8_to_pkcs1);
     
+    // test key exchange
     RUN_TEST(test_cb_kx_keypair);
     RUN_TEST(test_cb_kx_random_bufpair);
     RUN_TEST(test_cb_kx_svr_session_keys);
     RUN_TEST(test_cb_kx_clt_session_keys);
+
+    // test sm2
+    RUN_TEST(test_cb_sm2_keypair);
 
     return UNITY_END();
 }
