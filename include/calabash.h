@@ -20,5 +20,6 @@
 #include "calabash/sm4.h"
 #include "calabash/sm2.h"
 #include "calabash/keyexchange.h"
+#include "calabash/secretbox.h"
 
 #endif //CALABASH_H

@@ -858,3 +858,9 @@ int sm3_digest(const char* data, int data_len, char* digest)
     sm3(data, data_len, digest);
     return 0;
 }
+
+int cb_sm3_digest(const char* data, int data_len, char* digest)
+{
+    sm3(data, data_len, digest);
+    return 0;
+}

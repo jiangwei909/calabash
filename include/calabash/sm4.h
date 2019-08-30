@@ -1,6 +1,9 @@
 #ifndef SM4_H
 #define SM4_H
 
+#define CB_SM4_KEY_BYTES 16
+#define CB_SM4_MAC_BYTES 16
+
 /**
  *  @brief SM4进行ECB加密
  *  @details SM4进行ECB加密, 待加密的数据长度必须是16的倍数，如不足，需要调用者填充到16的倍数
@@ -38,6 +41,8 @@ int sm4_ecb_decrypt(const char* key, const char* cipher, int cipher_len, char* p
  */
 int sm4_cbc_encrypt(const char* key, const char* iv, const char* plain, int plain_len, char* cipher);
 
+int cb_sm4_cbc_encrypt(const char* key, const char* iv, const char* plain, int plain_len, char* cipher);
+
 /**
  *  @brief SM4进行CBC解密
  *  @details SM4进行CBC解密, 待解密的数据长度必须是16的倍数
@@ -50,5 +55,11 @@ int sm4_cbc_encrypt(const char* key, const char* iv, const char* plain, int plai
  *  @return 返回解密后明文的长度，负数表示失败
  */
 int sm4_cbc_decrypt(const char* key, const char* iv, const char* cipher, int cipher_len, char* plain);
+
+int cb_sm4_cbc_decrypt(const char* key, const char* iv, const char* cipher, int cipher_len, char* plain);
+
+int cb_sm4_mac(const char* key, const char* iv, const char* cipher, int cipher_len, char* mac);
+
+int cb_sm4_mac_verify(const char* key, const char* iv, const char* data, int data_len, const char* mac);
 
 #endif // !SM4_H

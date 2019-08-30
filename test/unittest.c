@@ -13,6 +13,8 @@
 #include "unity/unity.h"
 #include "test_keyexchange.h"
 #include "test_sm2.h"
+#include "test_sm4.h"
+#include "test_secretbox.h"
 
 void test_sm2_read_pvk_from_pemfile()
 {
@@ -1505,6 +1507,15 @@ int main(int argc, char* argv[]) {
     RUN_TEST(test_cb_sm2_keypair);
     RUN_TEST(test_cb_sm2_encrypt);
     RUN_TEST(test_cb_sm2_decrypt);
+
+    // test secret box
+    RUN_TEST(test_cb_secretbox_keygen);
+    RUN_TEST(test_cb_secretbox_easy);
+    RUN_TEST(test_cb_secretbox_open_easy);
+
+    // test sm4
+    RUN_TEST(test_cb_sm4_mac);
+    RUN_TEST(test_cb_sm4_mac_verify);
 
     return UNITY_END();
 }

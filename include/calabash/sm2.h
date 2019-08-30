@@ -176,4 +176,6 @@ int cb_sm2_decrypt(const char* pk, const char* cipher, int cipher_len, char* pla
  */
 int sm3_digest(const char* data, int data_len, char* digest);
 
+int cb_sm3_digest(const char* data, int data_len, char* digest);
+
 #endif //CALABASH_H
