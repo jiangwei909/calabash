@@ -1503,6 +1503,7 @@ int main(int argc, char* argv[]) {
     RUN_TEST(test_cb_kx_random_bufpair);
     RUN_TEST(test_cb_kx_svr_session_keys);
     RUN_TEST(test_cb_kx_clt_session_keys);
+    RUN_TEST(test_cb_kx_dh_session_key);
 
     // test sm2
     RUN_TEST(test_cb_sm2_keypair);

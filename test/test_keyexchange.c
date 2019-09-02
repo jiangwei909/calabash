@@ -93,3 +93,44 @@ void test_cb_kx_clt_session_keys()
     TEST_ASSERT_EQUAL_STRING(expected_tx_key, tx_key_hex);
     
 }
+
+void test_cb_kx_dh_session_key()
+{
+
+    char* private_key = "74F3D6BCC82D29819BC9D9445210B3C581373715E3D728A54580B675C3CD6620";
+    char* public_key = "0492F775BC22B55B8CCBD2B8BE78E9F64D6AA74283C3A5127F8A50DEE107456A7FE28E2A15C219408FE05147A8C968FD88D7A88179530F1D836392C00A4B484DCD";
+    char key[CB_KX_SESSIONKEY_BYTES] = { 0x0 };
+
+    char* private_key_2 = "338985976857799783B8E60E5A1B6341FD171A096F67B4409C310B6A076926F3";
+    char* public_key_2 = "04115FD9436BF40BC8866AC3B0333C208E1050A30851FA1056CA3D3177E00B200502AAF7E3CB98B97F09688A2D3DF2FD1645FB195FEB480A6B1C6FC72C8CE2DD56";
+
+    char pvk_bin[128] = { 0x0 };
+    char puk_bin[128] = { 0x0 };
+    char key_hex[128] = { 0x0 };
+    char key2_hex[128] = { 0x0 };
+    char key2[CB_KX_SESSIONKEY_BYTES] = { 0x0 };
+
+    cb_hex_to_bin(private_key, strlen(private_key), pvk_bin);
+    cb_hex_to_bin(public_key_2, strlen(public_key_2), puk_bin);
+
+    int ret = cb_kx_dh_session_key(pvk_bin, puk_bin, key);
+
+    TEST_ASSERT_EQUAL_INT(CB_KX_SESSIONKEY_BYTES, ret);
+
+    cb_bin_to_hex(key, ret, key_hex);
+    cb_debug("key hex=%s", key_hex);
+
+    memset(pvk_bin, 0, sizeof(pvk_bin));
+    memset(puk_bin, 0, sizeof(puk_bin));
+
+    cb_hex_to_bin(private_key_2, strlen(private_key_2), pvk_bin);
+    cb_hex_to_bin(public_key, strlen(public_key), puk_bin);
+
+    ret = cb_kx_dh_session_key(pvk_bin, puk_bin, key2);
+    cb_bin_to_hex(key2, ret, key2_hex);
+    cb_debug("key2 hex=%s", key2_hex);
+
+    TEST_ASSERT_EQUAL_INT(CB_KX_SESSIONKEY_BYTES, ret);
+    TEST_ASSERT_EQUAL_STRING(key_hex, key2_hex);
+
+}

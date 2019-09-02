@@ -69,8 +69,16 @@ int cb_kx_clt_session_keys(const char* rx_rnd, const char* tx_rnd, char* rx, cha
     return 0;
 }
 
-int cb_kx_svr_dh_session_key(const char* server_pk, const char* server_sk, const char* client_pk, char* key)
+int cb_kx_dh_session_key(const char* sk, const char* peer_pk, char* key)
 {
+    char tk[32] = { 0x0 };
+    int ret = -1;
 
-    return -1;
+    ret = cb_sm2_compute_key(sk, peer_pk, tk);
+
+    if (ret != 32 ) return -1;
+
+    memcpy(key, tk, CB_KX_SESSIONKEY_BYTES);
+
+    return CB_KX_SESSIONKEY_BYTES;
 }

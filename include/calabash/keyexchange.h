@@ -58,6 +58,6 @@ int cb_kx_svr_session_keys(const char* sk, const char* rx_rnd, const char* tx_pk
  */
 int cb_kx_clt_session_keys(const char* rx_rnd, const char* tx_rnd, char* rx, char* tx);
 
-int cb_kx_svr_dh_session_keys(const char* server_pk, const char* server_sk, const char* client_pk, char* rx, char* tx);
+int cb_kx_dh_session_key(const char* sk, const char* peer_pk, char* key);
 
 #endif // !KEYEXCHANGE_H
