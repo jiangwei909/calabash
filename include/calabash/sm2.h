@@ -178,4 +178,6 @@ int sm3_digest(const char* data, int data_len, char* digest);
 
 int cb_sm3_digest(const char* data, int data_len, char* digest);
 
+int cb_sm2_compute_key(const char* private_key, const char* public_key, char* key);
+
 #endif //CALABASH_H

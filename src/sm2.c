@@ -864,3 +864,40 @@ int cb_sm3_digest(const char* data, int data_len, char* digest)
     sm3(data, data_len, digest);
     return 0;
 }
+
+static inline void *kdf_sm3(const char* in, int in_len, char* out, int *out_len)
+{
+    sm3(in, in_len, out);
+    *out_len = 32;
+}
+
+int cb_sm2_compute_key(const char* private_key, const char* public_key, char* key)
+{
+    char buf[32] = { 0x0 };
+
+    EC_KEY* ec_key = NULL;
+    EC_GROUP* group = NULL;
+    EC_POINT* puk_point = NULL;
+    BIGNUM* prv_bn = NULL;
+
+    char encoded_cipher[512] = { 0x0 };
+    int encoded_cipher_len = 0;
+    int ret = -1;
+
+    prv_bn = BN_bin2bn(private_key, 32, NULL);
+    ec_key = EC_KEY_new_by_curve_name(NID_sm2p256v1);
+    group = EC_KEY_get0_group(ec_key);
+    puk_point = EC_POINT_new(group);
+
+    if (!EC_KEY_set_private_key(ec_key, prv_bn))
+    {
+        printf("set private key failed.\n");
+        return -1;
+    }
+
+    EC_POINT_oct2point(group, puk_point, public_key, 65, NULL);
+
+    ret = ECDH_compute_key(key, 32, puk_point,ec_key, kdf_sm3);
+
+    return ret;
+}

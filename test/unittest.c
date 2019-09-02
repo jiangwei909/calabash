@@ -15,6 +15,7 @@
 #include "test_sm2.h"
 #include "test_sm4.h"
 #include "test_secretbox.h"
+#include "test_kdf.h"
 
 void test_sm2_read_pvk_from_pemfile()
 {
@@ -1507,6 +1508,7 @@ int main(int argc, char* argv[]) {
     RUN_TEST(test_cb_sm2_keypair);
     RUN_TEST(test_cb_sm2_encrypt);
     RUN_TEST(test_cb_sm2_decrypt);
+    RUN_TEST(test_cb_sm2_compute_key);
 
     // test secret box
     RUN_TEST(test_cb_secretbox_keygen);
@@ -1516,6 +1518,9 @@ int main(int argc, char* argv[]) {
     // test sm4
     RUN_TEST(test_cb_sm4_mac);
     RUN_TEST(test_cb_sm4_mac_verify);
+
+    // test kdf
+    RUN_TEST(test_cb_kdf_derive_from_key);
 
     return UNITY_END();
 }

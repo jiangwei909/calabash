@@ -76,3 +76,24 @@ void test_cb_sm2_decrypt()
 
     TEST_ASSERT_EQUAL_STRING(expected_plain, plain);
 }
+
+void test_cb_sm2_compute_key()
+{
+    char* private_key = "74F3D6BCC82D29819BC9D9445210B3C581373715E3D728A54580B675C3CD6620";
+    char* public_key = "0492F775BC22B55B8CCBD2B8BE78E9F64D6AA74283C3A5127F8A50DEE107456A7FE28E2A15C219408FE05147A8C968FD88D7A88179530F1D836392C00A4B484DCD";
+    char key[32] = { 0x0 };
+
+    char pvk_bin[128] = { 0x0 };
+    char puk_bin[128] = { 0x0 };
+    char key_hex[128] = { 0x0 };
+
+    cb_hex_to_bin(private_key, strlen(private_key), pvk_bin);
+    cb_hex_to_bin(public_key, strlen(public_key), puk_bin);
+
+    int ret = cb_sm2_compute_key(pvk_bin, puk_bin, key);
+
+    cb_bin_to_hex(key, ret, key_hex);
+    cb_debug("key hex=%s", key_hex);
+
+    TEST_ASSERT_EQUAL_INT(32, ret);
+}

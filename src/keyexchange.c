@@ -68,3 +68,9 @@ int cb_kx_clt_session_keys(const char* rx_rnd, const char* tx_rnd, char* rx, cha
 
     return 0;
 }
+
+int cb_kx_svr_dh_session_key(const char* server_pk, const char* server_sk, const char* client_pk, char* key)
+{
+
+    return -1;
+}
