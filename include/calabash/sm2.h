@@ -129,8 +129,6 @@ int cb_sm2_decrypt(const char* pk, const char* cipher, int cipher_len, char* pla
  *  @param digest 摘要值,固定长度32
  *  @return 成功返回0，否则表示失败
  */
-int sm3_digest(const char* data, int data_len, char* digest);
-
 int cb_sm3_digest(const char* data, int data_len, char* digest);
 
 int cb_sm2_compute_key(const char* private_key, const char* public_key, char* key);

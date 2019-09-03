@@ -719,12 +719,6 @@ int cb_sm2_decrypt(const char* sk, const char* cipher, int cipher_len, char* pla
     return plain_len;
 }
 
-int sm3_digest(const char* data, int data_len, char* digest)
-{
-    sm3(data, data_len, digest);
-    return 0;
-}
-
 int cb_sm3_digest(const char* data, int data_len, char* digest)
 {
     sm3(data, data_len, digest);
