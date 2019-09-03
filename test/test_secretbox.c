@@ -56,3 +56,21 @@ void test_cb_secretbox_open_easy()
     TEST_ASSERT_EQUAL_INT(3, plain_len);
     TEST_ASSERT_EQUAL_STRING(expected_plain, plain);
 }
+
+void test_cb_secretbox_auth()
+{
+    char* sk = "0123456789ABCDEF";
+    char* data = "6E4AFD3DF31C76D1923EB3255349BE8E9F18FEE8F9705EBFC4E53B5B87ACFD84";
+    int data_len = 0;
+    data_len = strlen(data);
+    char mac[40] = { 0x0 };
+    char mac_hex[80] = { 0x0 };
+    char data_bin[40] = { 0x0 };
+
+    int mac_len = cb_secretbox_auth(sk, data, data_len, mac);
+    cb_bin_to_hex(mac, mac_len, mac_hex);
+    printf("mac hex=%s\n", mac_hex);
+
+    TEST_ASSERT_EQUAL_INT(CB_SECRETBOX_AUTHMAC_BYTES, mac_len);
+
+}

@@ -95,3 +95,11 @@ int cb_secretbox_open_easy(const char* sk, const char* data, unsigned int data_l
 
     return plain_len;
 }
+
+int cb_secretbox_auth(const char* sk, const char* data, unsigned int data_len, char* mac)
+{
+    
+    sm3_hmac(data, data_len, sk, CB_SECRETBOX_KEY_BYTES, mac);
+
+    return SM3_HMAC_SIZE;
+}
