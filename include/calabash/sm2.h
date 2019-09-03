@@ -15,7 +15,7 @@
 
 #define CB_SM2_PUBLICKEY_BYTES 65
 #define CB_SM2_SECRETKEY_BYTES 32
-
+#define CB_SM3_DIGEST_BYTES 32
 
 
 /**

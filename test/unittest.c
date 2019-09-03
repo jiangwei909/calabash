@@ -17,7 +17,7 @@
 #include "test_secretbox.h"
 #include "test_kdf.h"
 #include "test_pem.h"
-
+#include "test_sm3.h"
 
 
 void test_sm2_compress_public_key()
@@ -373,23 +373,7 @@ void test_encode_cipher_text()
     TEST_ASSERT_EQUAL_STRING(expected_no_string, no_string_hex);
 }
 
-void test_sm3_digest()
-{
-    char* data = "12345678";
-    int ret = -1;
-    char digest[128];
-    int digest_len = -1;
-    char* expected_digest = "0FFFFF81E971FA3F09107ABF77931463FC0710BFB8962EFEAE3D5654B073BB0C";
-    char digest_hex[128] = { 0x0 };
-    int digest_hex_len = 0;
-    
-    ret = sm3_digest(data, strlen(data), digest);
 
-    bin_to_hex(digest, 32, digest_hex, &digest_hex_len);
-    
-    TEST_ASSERT_EQUAL_INT(0, ret);
-    TEST_ASSERT_EQUAL_STRING(expected_digest, digest_hex);
-}
 
 void test_sm4_ecb_encrypt()
 {
@@ -1374,7 +1358,7 @@ int main(int argc, char* argv[]) {
     RUN_TEST(test_remove_format_from_cipher_text);
     RUN_TEST(test_encode_cipher_text);
 
-    RUN_TEST(test_sm3_digest);
+    
     RUN_TEST(test_sm4_ecb_encrypt);
     RUN_TEST(test_sm4_ecb_decrypt);
 
@@ -1438,6 +1422,9 @@ int main(int argc, char* argv[]) {
 
     // test kdf
     RUN_TEST(test_cb_kdf_derive_from_key);
+
+    // test sm3
+    RUN_TEST(test_cb_sm3_digest);
 
     return UNITY_END();
 }

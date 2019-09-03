@@ -728,13 +728,13 @@ int sm3_digest(const char* data, int data_len, char* digest)
 int cb_sm3_digest(const char* data, int data_len, char* digest)
 {
     sm3(data, data_len, digest);
-    return 0;
+    return CB_SM3_DIGEST_BYTES;
 }
 
 static inline void *kdf_sm3(const char* in, int in_len, char* out, int *out_len)
 {
     sm3(in, in_len, out);
-    *out_len = 32;
+    *out_len = CB_SM3_DIGEST_BYTES;
 }
 
 int cb_sm2_compute_key(const char* private_key, const char* public_key, char* key)
