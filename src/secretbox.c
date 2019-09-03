@@ -98,8 +98,21 @@ int cb_secretbox_open_easy(const char* sk, const char* data, unsigned int data_l
 
 int cb_secretbox_auth(const char* sk, const char* data, unsigned int data_len, char* mac)
 {
-    
+
     sm3_hmac(data, data_len, sk, CB_SECRETBOX_KEY_BYTES, mac);
 
     return SM3_HMAC_SIZE;
+}
+
+int cb_secretbox_auth_verify(const char* sk, const char* data, unsigned int data_len, const char* mac)
+{
+    char actual_mac[SM3_HMAC_SIZE] = { 0x0 };
+
+    sm3_hmac(data, data_len, sk, CB_SECRETBOX_KEY_BYTES, actual_mac);
+
+    for(int i = 0; i< SM3_HMAC_SIZE; i++) {
+        if (actual_mac[i] != mac[i]) return -1;
+    }
+
+    return 0;
 }

@@ -74,3 +74,20 @@ void test_cb_secretbox_auth()
     TEST_ASSERT_EQUAL_INT(CB_SECRETBOX_AUTHMAC_BYTES, mac_len);
 
 }
+
+void test_cb_secretbox_auth_verify()
+{
+    char* sk = "0123456789ABCDEF";
+    char* data = "6E4AFD3DF31C76D1923EB3255349BE8E9F18FEE8F9705EBFC4E53B5B87ACFD84";
+    int data_len = 0;
+    data_len = strlen(data);
+    char mac[40] = { 0x0 };
+    char* mac_hex = "CD66BB3CCECC3EAD6043020F7E2DC0093DFCECC37599BBED0BA4B0B84AE1D18D";
+    char data_bin[40] = { 0x0 };
+
+    cb_hex_to_bin(mac_hex, strlen(mac_hex), mac);
+
+    int ret = cb_secretbox_auth_verify(sk, data, data_len, mac);
+
+    TEST_ASSERT_EQUAL_INT(0, ret);
+}

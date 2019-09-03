@@ -1306,6 +1306,7 @@ int main(int argc, char* argv[]) {
     RUN_TEST(test_cb_secretbox_easy);
     RUN_TEST(test_cb_secretbox_open_easy);
     RUN_TEST(test_cb_secretbox_auth);
+    RUN_TEST(test_cb_secretbox_auth_verify);
 
     // test sm4
     RUN_TEST(test_cb_sm4_mac);
