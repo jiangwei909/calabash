@@ -48,6 +48,7 @@ int cb_kdf_derive_from_key(const char* master_key, unsigned int subkey_id, const
     }
     
     memcpy(subkey, tmp_buff, subkey_size);
+    free(tmp_buff);
 
     return 0;
 }
