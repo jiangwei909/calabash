@@ -373,110 +373,6 @@ void test_encode_cipher_text()
     TEST_ASSERT_EQUAL_STRING(expected_no_string, no_string_hex);
 }
 
-
-
-void test_sm4_ecb_encrypt()
-{
-    char* key = "0123456789ABCDEFFEDCBA9876543210";
-    char* plain_hex = "0123456789ABCDEFFEDCBA98765432100123456789ABCDEFFEDCBA9876543210";
-    char* expected_cipher_hex = "681EDF34D206965E86B3E94F536E4246681EDF34D206965E86B3E94F536E4246";
-
-    char key_bin[32] = { 0x0 };
-    char plain_bin[128] = { 0x0 };
-    char cipher_bin[128] = { 0x0 };
-    char cipher_hex[256] = { 0x0 };
-    int plain_bin_len = 0;
-    
-    hex_to_bin(key, strlen(key), key_bin, NULL);
-    hex_to_bin(plain_hex, strlen(plain_hex), plain_bin, &plain_bin_len);
-    
-    int ret = sm4_ecb_encrypt(key_bin, plain_bin, plain_bin_len, cipher_bin);    
-    
-    TEST_ASSERT_EQUAL_INT(plain_bin_len, ret);
-    
-    bin_to_hex(cipher_bin, ret, cipher_hex, NULL);
-    
-    TEST_ASSERT_EQUAL_STRING(expected_cipher_hex, cipher_hex);
-}
-
-void test_sm4_ecb_decrypt()
-{
-    char* key = "0123456789ABCDEFFEDCBA9876543210";
-    char* expected_plain_hex = "0123456789ABCDEFFEDCBA98765432100123456789ABCDEFFEDCBA9876543210";
-    char* cipher_hex = "681EDF34D206965E86B3E94F536E4246681EDF34D206965E86B3E94F536E4246";
-
-    char key_bin[32] = { 0x0 };
-    char plain_bin[128] = { 0x0 };
-    char cipher_bin[128] = { 0x0 };
-
-    char plain_hex[256] = { 0x0 };
-    int plain_bin_len = 0;
-    int cipher_bin_len = 0;
-    
-    hex_to_bin(key, strlen(key), key_bin, NULL);
-    hex_to_bin(cipher_hex, strlen(cipher_hex), cipher_bin, &cipher_bin_len);
-    
-    int ret = sm4_ecb_decrypt(key_bin, cipher_bin, cipher_bin_len, plain_bin);    
-    
-    TEST_ASSERT_EQUAL_INT(cipher_bin_len, ret);
-    
-    bin_to_hex(plain_bin, ret, plain_hex, NULL);
-    
-    TEST_ASSERT_EQUAL_STRING(expected_plain_hex, plain_hex);
-}
-
-void test_sm4_cbc_encrypt()
-{
-    char* key = "0123456789ABCDEFFEDCBA9876543210";
-    char* plain_hex = "0123456789ABCDEFFEDCBA98765432100123456789ABCDEFFEDCBA9876543210";
-    char* expected_cipher_hex = "681EDF34D206965E86B3E94F536E42469FF11DCFD3AFAA236C76090BABC3BB85";
-    
-    char key_bin[32] = { 0x0 };
-    char plain_bin[128] = { 0x0 };
-    char cipher_bin[128] = { 0x0 };
-    char cipher_hex[256] = { 0x0 };
-    int plain_bin_len = 0;
-    char iv[16] = { 0x0 };
-    
-    hex_to_bin(key, strlen(key), key_bin, NULL);
-    hex_to_bin(plain_hex, strlen(plain_hex), plain_bin, &plain_bin_len);
-    
-    int ret = sm4_cbc_encrypt(key_bin, iv, plain_bin, plain_bin_len, cipher_bin);
-    
-    TEST_ASSERT_EQUAL_INT(plain_bin_len, ret);
-    
-    bin_to_hex(cipher_bin, ret, cipher_hex, NULL);
-    
-    TEST_ASSERT_EQUAL_STRING(expected_cipher_hex, cipher_hex);
-}
-
-void test_sm4_cbc_decrypt()
-{
-    char* key = "0123456789ABCDEFFEDCBA9876543210";
-    char* expected_plain_hex = "0123456789ABCDEFFEDCBA98765432100123456789ABCDEFFEDCBA9876543210";
-    char* cipher_hex = "681EDF34D206965E86B3E94F536E42469FF11DCFD3AFAA236C76090BABC3BB85";
-
-    char key_bin[32] = { 0x0 };
-    char plain_bin[128] = { 0x0 };
-    char cipher_bin[128] = { 0x0 };
-
-    char plain_hex[256] = { 0x0 };
-    int plain_bin_len = 0;
-    int cipher_bin_len = 0;
-    char iv[16] = { 0x0 };
-    
-    hex_to_bin(key, strlen(key), key_bin, NULL);
-    hex_to_bin(cipher_hex, strlen(cipher_hex), cipher_bin, &cipher_bin_len);
-    
-    int ret = sm4_cbc_decrypt(key_bin, iv, cipher_bin, cipher_bin_len, plain_bin);    
-    
-    TEST_ASSERT_EQUAL_INT(cipher_bin_len, ret);
-    
-    bin_to_hex(plain_bin, ret, plain_hex, NULL);
-    
-    TEST_ASSERT_EQUAL_STRING(expected_plain_hex, plain_hex);
-}
-
 void test_des_ecb_encrypt()
 {
     char* key = "0123456789ABCDEF";
@@ -1358,12 +1254,6 @@ int main(int argc, char* argv[]) {
     RUN_TEST(test_remove_format_from_cipher_text);
     RUN_TEST(test_encode_cipher_text);
 
-    
-    RUN_TEST(test_sm4_ecb_encrypt);
-    RUN_TEST(test_sm4_ecb_decrypt);
-
-    RUN_TEST(test_sm4_cbc_encrypt);
-    RUN_TEST(test_sm4_cbc_decrypt);
 
     RUN_TEST(test_des_ecb_encrypt);
     RUN_TEST(test_des_ecb_decrypt);
@@ -1419,6 +1309,12 @@ int main(int argc, char* argv[]) {
     // test sm4
     RUN_TEST(test_cb_sm4_mac);
     RUN_TEST(test_cb_sm4_mac_verify);
+    
+    RUN_TEST(test_cb_sm4_ecb_encrypt);
+    RUN_TEST(test_cb_sm4_ecb_decrypt);
+
+    RUN_TEST(test_cb_sm4_cbc_encrypt);
+    RUN_TEST(test_cb_sm4_cbc_decrypt);
 
     // test kdf
     RUN_TEST(test_cb_kdf_derive_from_key);

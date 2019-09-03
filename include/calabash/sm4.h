@@ -14,7 +14,7 @@
  *  @param cipher 加密后的密文
  *  @return 返回加密后密文的长度，负数表示失败
  */
-int sm4_ecb_encrypt(const char* key, const char* plain, int plain_len, char* cipher);
+int cb_sm4_ecb_encrypt(const char* key, const char* plain, int plain_len, char* cipher);
 
 /**
  *  @brief SM4进行ECB解密
@@ -26,7 +26,7 @@ int sm4_ecb_encrypt(const char* key, const char* plain, int plain_len, char* cip
  *  @param plain 解密后的明文
  *  @return 返回解密后明文的长度，负数表示失败
  */
-int sm4_ecb_decrypt(const char* key, const char* cipher, int cipher_len, char* plain);
+int cb_sm4_ecb_decrypt(const char* key, const char* cipher, int cipher_len, char* plain);
 
 /**
  *  @brief SM4进行CBC加密
@@ -39,8 +39,6 @@ int sm4_ecb_decrypt(const char* key, const char* cipher, int cipher_len, char* p
  *  @param cipher 加密后的密文
  *  @return 返回加密后密文的长度，负数表示失败
  */
-int sm4_cbc_encrypt(const char* key, const char* iv, const char* plain, int plain_len, char* cipher);
-
 int cb_sm4_cbc_encrypt(const char* key, const char* iv, const char* plain, int plain_len, char* cipher);
 
 /**
@@ -54,8 +52,6 @@ int cb_sm4_cbc_encrypt(const char* key, const char* iv, const char* plain, int p
  *  @param plain 解密后的明文
  *  @return 返回解密后明文的长度，负数表示失败
  */
-int sm4_cbc_decrypt(const char* key, const char* iv, const char* cipher, int cipher_len, char* plain);
-
 int cb_sm4_cbc_decrypt(const char* key, const char* iv, const char* cipher, int cipher_len, char* plain);
 
 int cb_sm4_mac(const char* key, const char* iv, const char* cipher, int cipher_len, char* mac);
