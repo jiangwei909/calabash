@@ -179,34 +179,6 @@ void test_sm2_sign_verify_2()
     //assert_int_equal(ret, 0);
 }
 
-void test_sm2_get_puk_from_pvk()
-{
-    char puk[144] = { 0x0 };
-    char* pvk = "74F3D6BCC82D29819BC9D9445210B3C581373715E3D728A54580B675C3CD6620";
-    int pvk_len;
-    int puk_len;
-
-    char puk_hex[512] = { 0x0};
-    char pvk_hex[512] = { 0x0};
-    int pvk_hex_len = 0;
-    int puk_hex_len = 0;
-
-    char pvk_bin[64] = { 0x0};
-    int pvk_bin_len = 0;
-    char* expected_puk_hex = "0492F775BC22B55B8CCBD2B8BE78E9F64D6AA74283C3A5127F8A50DEE107456A7FE28E2A15C219408FE05147A8C968FD88D7A88179530F1D836392C00A4B484DCD";
-    
-    int ret = -1;
-
-    hex_to_bin(pvk, 64, pvk_bin, &pvk_bin_len);
-    
-    ret = sm2_get_puk_from_pvk(pvk_bin, pvk_bin_len, puk, &puk_len);
-    TEST_ASSERT_EQUAL_INT(0, ret);
-
-    ret = bin_to_hex(puk, puk_len, puk_hex, &puk_hex_len);
-
-    TEST_ASSERT_EQUAL_STRING(expected_puk_hex, puk_hex);
-}
-
 void test_remove_format_from_cipher_text()
 {
     char* cipher_text = "308199022060EDC5BAFEDBD1B8774A28314035D6CED587E166FCC399F3166499C7D98054A3022100C60E7506FFABBEFE21FF59AABDC9BC255B7D8F4D4A597506FEF099DC704339A504202FD12F6B82E5E81982EBD68E679E2EEE0E9294604BF147B565C8BC450F0AB5B20430D5CE6D9943D09DA2CF544565C67E867AC23A3AEA4BA51211248D745C5D32894EC0352AF6C8956EE6A640C74F30DDC20D";
@@ -1124,7 +1096,7 @@ int main(int argc, char* argv[]) {
     RUN_TEST(test_sm2_sign);
     RUN_TEST(test_sm2_sign_verify);
     RUN_TEST(test_sm2_sign_verify_2);
-    RUN_TEST(test_sm2_get_puk_from_pvk);
+    
     RUN_TEST(test_remove_format_from_cipher_text);
     RUN_TEST(test_encode_cipher_text);
 
@@ -1175,6 +1147,7 @@ int main(int argc, char* argv[]) {
     RUN_TEST(test_cb_sm2_compute_key);
     RUN_TEST(test_cb_sm2_compress_public_key);
     RUN_TEST(test_cb_sm2_uncompress_public_key);
+    RUN_TEST(test_cb_sm2_compute_puk);
 
     // test secret box
     RUN_TEST(test_cb_secretbox_keygen);

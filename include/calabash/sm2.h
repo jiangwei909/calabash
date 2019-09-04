@@ -50,13 +50,11 @@ int sm2_sign_verify(const unsigned char *puk, int puk_len, const unsigned char *
  * @brief 从私钥中获取公钥
  * @details 从SM2私钥中获取公钥
 
- * @param pvk 私钥
- * @param pvk_len 私钥长度
- * @param puk 返回的公钥
- * @param puk_len 返回公钥的长度
+ * @param pvk 私钥,长度固定为32
+ * @param puk 返回的公钥,以0x04开头,长度固定为65
  * @return 成功返回0，否则表示失败
  */
-int sm2_get_puk_from_pvk(const char* pvk, int pvk_len, char* puk, int* puk_len);
+int cb_sm2_compute_puk(const char* pvk, char* puk);
 
 /**
  *  @brief 生成SM2公私密钥对

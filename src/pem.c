@@ -122,37 +122,3 @@ int sm2_read_puk_from_pem_str(const char* pem_str, int pem_str_len, char* puk, i
     BIO_free(fp);
     return 0;
 }
-
-
-int sm2_get_puk_from_pvk(const char* pvk, int pvk_len, char* puk, int* puk_len)
-{
-    EC_KEY* ec_key = NULL;
-    EC_GROUP* group = NULL;
-    EC_POINT* puk_point = NULL;
-    BIGNUM* prv_bn = NULL;
-    
-    int ret = -1;
-
-    prv_bn = BN_bin2bn(pvk, pvk_len, NULL);
-    ec_key = EC_KEY_new_by_curve_name(NID_sm2p256v1);
-    group = EC_KEY_get0_group(ec_key);
-    puk_point = EC_POINT_new(group);
-
-    if (!EC_KEY_set_private_key(ec_key, prv_bn))
-    {
-        printf("set private key failed.\n");
-        return -1;
-    }
-
-    if (!EC_POINT_mul(group, puk_point, prv_bn, NULL, NULL, NULL))
-    {
-        return -1;
-    }
-
-    ret = EC_POINT_point2oct(group, puk_point,
-			     POINT_CONVERSION_UNCOMPRESSED,
-			     puk, 256, NULL);
-    *puk_len = ret;
-
-    return 0;
-}

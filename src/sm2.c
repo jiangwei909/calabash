@@ -568,3 +568,46 @@ int cb_sm2_compute_key(const char* private_key, const char* public_key, char* ke
 
     return ret;
 }
+
+
+int cb_sm2_compute_puk(const char* pvk, char* puk)
+{
+    EC_KEY* ec_key = NULL;
+    EC_GROUP* group = NULL;
+    EC_POINT* puk_point = NULL;
+    BIGNUM* prv_bn = NULL;
+    
+    int ret = -1;
+    int len = -1;
+
+    prv_bn = BN_bin2bn(pvk, CB_SM2_SECRETKEY_BYTES, NULL);
+    ec_key = EC_KEY_new_by_curve_name(NID_sm2p256v1);
+    group = EC_KEY_get0_group(ec_key);
+    puk_point = EC_POINT_new(group);
+
+    if (!EC_KEY_set_private_key(ec_key, prv_bn))
+    {
+        printf("set private key failed.\n");
+        ret -1;
+        goto end;
+    }
+
+    if (!EC_POINT_mul(group, puk_point, prv_bn, NULL, NULL, NULL))
+    {
+        ret = -2;
+        goto end;
+    }
+
+    len = EC_POINT_point2oct(group, puk_point,
+			     POINT_CONVERSION_UNCOMPRESSED,
+			     puk, CB_SM2_PUBLICKEY_BYTES, NULL);
+
+    if (len != CB_SM2_PUBLICKEY_BYTES) ret = -3;
+
+end:
+    EC_KEY_free(ec_key);
+    EC_POINT_free(puk_point);
+    BN_free(prv_bn);
+
+    return 0;
+}

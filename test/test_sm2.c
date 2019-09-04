@@ -186,3 +186,32 @@ void test_cb_sm2_uncompress_public_key()
     cb_bin_to_hex(uncompressed_puk, CB_SM2_PUBLICKEY_BYTES, puk_hex);
     TEST_ASSERT_EQUAL_STRING(expected_puk2, puk_hex);
 }
+
+
+void test_cb_sm2_compute_puk()
+{
+    char puk[144] = { 0x0 };
+    char* pvk = "74F3D6BCC82D29819BC9D9445210B3C581373715E3D728A54580B675C3CD6620";
+    int pvk_len;
+    int puk_len = 65;
+
+    char puk_hex[512] = { 0x0};
+    char pvk_hex[512] = { 0x0};
+    int pvk_hex_len = 0;
+    int puk_hex_len = 0;
+
+    char pvk_bin[65] = { 0x0};
+    int pvk_bin_len = 0;
+    char* expected_puk_hex = "0492F775BC22B55B8CCBD2B8BE78E9F64D6AA74283C3A5127F8A50DEE107456A7FE28E2A15C219408FE05147A8C968FD88D7A88179530F1D836392C00A4B484DCD";
+    
+    int ret = -1;
+
+    cb_hex_to_bin(pvk, 64, pvk_bin);
+    
+    ret = cb_sm2_compute_puk(pvk_bin, puk);
+    TEST_ASSERT_EQUAL_INT(0, ret);
+
+    cb_bin_to_hex(puk, puk_len, puk_hex);
+
+    TEST_ASSERT_EQUAL_STRING(expected_puk_hex, puk_hex);
+}
