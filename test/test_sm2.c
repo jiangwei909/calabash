@@ -150,3 +150,39 @@ void test_cb_sm2_compress_public_key()
     bin_to_hex(compressed_puk, CB_SM2_COMPRESS_PUBLICKEY_BYTES, puk_hex, &puk_bin_len);
     TEST_ASSERT_EQUAL_STRING(excepted_puk2, puk_hex);
 }
+
+void test_cb_sm2_uncompress_public_key()
+{
+    char *expected_puk = "0481BF68EDF30E4FF2D57545703999D1DF6EDEE63A1FC5F46C8FD768F2A4C2308BB328F1038AF1295CBB1A4B29FC2E2EA0E05562E5058D8A94A703F03F9996327D";
+    char *expected_puk2 = "04C3B6D648E13B191C0CB6F754C994C369B5D0842C0E8F5AF2E08F9E199DDBF5C88EA2675A7F784506714C29315B55307BD96A3A866566F703F4D86F072421018A";
+
+    int ret = 0;
+    char uncompressed_puk[128] = { 0x0 };
+    int uncompressed_puk_len;
+    char *compress_puk = "0381BF68EDF30E4FF2D57545703999D1DF6EDEE63A1FC5F46C8FD768F2A4C2308B";
+    // char *excepted_puk = "03176BC7E66ADBE66734A38A19F6901B1C9D7D90F6428BD08B58F075F934728D37";
+    char *compress_puk2 = "02C3B6D648E13B191C0CB6F754C994C369B5D0842C0E8F5AF2E08F9E199DDBF5C8";
+
+    char puk_bin[128] = { 0x0};
+    int puk_bin_len;
+    char puk_hex[144] = { 0x0};
+    int puk_hex_len;
+
+    cb_hex_to_bin(compress_puk, strlen(compress_puk), puk_bin);
+
+    ret = cb_sm2_uncompress_public_key(puk_bin, uncompressed_puk);
+    TEST_ASSERT_EQUAL_INT(0, ret);
+
+    cb_bin_to_hex(uncompressed_puk, CB_SM2_PUBLICKEY_BYTES, puk_hex);
+
+    //assert_int_equal(ret, 0);
+    TEST_ASSERT_EQUAL_STRING(expected_puk, puk_hex);
+
+    puk_bin_len = cb_hex_to_bin(compress_puk2, strlen(compress_puk2), puk_bin);
+
+    ret = cb_sm2_uncompress_public_key(puk_bin, uncompressed_puk);
+    TEST_ASSERT_EQUAL_INT(0, ret);
+
+    cb_bin_to_hex(uncompressed_puk, CB_SM2_PUBLICKEY_BYTES, puk_hex);
+    TEST_ASSERT_EQUAL_STRING(expected_puk2, puk_hex);
+}

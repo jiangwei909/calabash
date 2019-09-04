@@ -74,45 +74,6 @@ void cleanup()
     printf("DONE\n");
 }
 
-
-
-void test_uncompress_public_key()
-{
-    char *puk = "0481BF68EDF30E4FF2D57545703999D1DF6EDEE63A1FC5F46C8FD768F2A4C2308BB328F1038AF1295CBB1A4B29FC2E2EA0E05562E5058D8A94A703F03F9996327D";
-    char *puk2 = "04C3B6D648E13B191C0CB6F754C994C369B5D0842C0E8F5AF2E08F9E199DDBF5C88EA2675A7F784506714C29315B55307BD96A3A866566F703F4D86F072421018A";
-
-    int ret = 0;
-    char uncompressed_puk[128] = { 0x0 };
-    int uncompressed_puk_len;
-    char *excepted_puk = "0381BF68EDF30E4FF2D57545703999D1DF6EDEE63A1FC5F46C8FD768F2A4C2308B";
-    // char *excepted_puk = "03176BC7E66ADBE66734A38A19F6901B1C9D7D90F6428BD08B58F075F934728D37";
-    char *excepted_puk2 = "02C3B6D648E13B191C0CB6F754C994C369B5D0842C0E8F5AF2E08F9E199DDBF5C8";
-
-    char puk_bin[128] = { 0x0};
-    int puk_bin_len;
-    char puk_hex[144] = { 0x0};
-    int puk_hex_len;
-
-    hex_to_bin(excepted_puk, strlen(excepted_puk), puk_bin, &puk_bin_len);
-
-    ret = sm2_uncompress_public_key(puk_bin, puk_bin_len, uncompressed_puk, &uncompressed_puk_len);
-    TEST_ASSERT_EQUAL_INT(0, ret);
-
-    bin_to_hex(uncompressed_puk, uncompressed_puk_len, puk_hex, &puk_bin_len);
-printf("aaaaaa uncompress pub key= %s\n", puk_hex);
-
-    //assert_int_equal(ret, 0);
-    TEST_ASSERT_EQUAL_STRING(puk, puk_hex);
-
-    hex_to_bin(excepted_puk2, strlen(excepted_puk2), puk_bin, &puk_bin_len);
-
-    ret = sm2_uncompress_public_key(puk_bin, puk_bin_len, uncompressed_puk, &uncompressed_puk_len);
-    TEST_ASSERT_EQUAL_INT(0, ret);
-
-    bin_to_hex(uncompressed_puk, uncompressed_puk_len, puk_hex, &puk_bin_len);
-    TEST_ASSERT_EQUAL_STRING(puk2, puk_hex);
-}
-
 void test_sm2_sign_with_pem()
 {
     char* pvk = "3077020101042074F3D6BCC82D29819BC9D9445210B3C581373715E3D728A54580B675C3CD6620A00A06082A811CCF5501822DA1440342000492F775BC22B55B8CCBD2B8BE78E9F64D6AA74283C3A5127F8A50DEE107456A7FE28E2A15C219408FE05147A8C968FD88D7A88179530F1D836392C00A4B484DCD";
@@ -1265,7 +1226,7 @@ int main(int argc, char* argv[]) {
     RUN_TEST(test_sm2_read_puk_from_pem_str);
     
     
-    RUN_TEST(test_uncompress_public_key);
+
     RUN_TEST(test_sm2_sign_with_pem);
     RUN_TEST(test_sm2_sign);
     RUN_TEST(test_sm2_sign_verify);
@@ -1324,6 +1285,7 @@ int main(int argc, char* argv[]) {
     RUN_TEST(test_cb_sm2_decrypt);
     RUN_TEST(test_cb_sm2_compute_key);
     RUN_TEST(test_cb_sm2_compress_public_key);
+    RUN_TEST(test_cb_sm2_uncompress_public_key);
 
     // test secret box
     RUN_TEST(test_cb_secretbox_keygen);

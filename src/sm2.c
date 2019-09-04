@@ -24,8 +24,7 @@
 #include "calabash/sm2.h"
 #include "calabash/utils.h"
 
-int cb_sm2_compress_public_key(const char *puk, int puk_len,
-                            char *compressed_puk, int *compressed_puk_len)
+int cb_sm2_compress_public_key(const char *puk, int puk_len, char *compressed_puk)
 {
     EC_GROUP *curve_group = NULL;
     EC_POINT *point = NULL;
@@ -35,6 +34,7 @@ int cb_sm2_compress_public_key(const char *puk, int puk_len,
     unsigned char buff[128] = {0x0};
     int ret = 0;
     int puk_offset = 0;
+    int len = -1;
 
     if (puk_len != 64 && puk_len != 65) {
         return -1;
@@ -57,12 +57,12 @@ int cb_sm2_compress_public_key(const char *puk, int puk_len,
     point = EC_POINT_new(curve_group);
     if (point == NULL) {
         ret = -3;
-        goto group_free;
+        goto end;
     }
 
     if (!EC_POINT_is_on_curve(curve_group, point, NULL)) {
         ret = -4;
-        goto point_free;
+        goto end;
     }
 
     xy = BN_new();
@@ -76,74 +76,66 @@ int cb_sm2_compress_public_key(const char *puk, int puk_len,
 
     if (!EC_POINT_set_affine_coordinates_GFp(curve_group, point, x, y, NULL)) {
         ret = -5;
-        goto bn_free;
+        goto end;
     }
 
-    if ((ret = EC_POINT_point2oct(curve_group, point,
+    if ((len = EC_POINT_point2oct(curve_group, point,
                                      POINT_CONVERSION_COMPRESSED,
                                      compressed_puk, CB_SM2_COMPRESS_PUBLICKEY_BYTES, NULL)) != CB_SM2_COMPRESS_PUBLICKEY_BYTES)
     {
         ret = -6;
-    } else {
-        ret = 0;
-    }
+    } 
 
-bn_free:
+end:
     BN_free(xy);
     BN_free(x);
     BN_free(y);
-point_free:
     EC_POINT_free(point);
-group_free:
     EC_GROUP_free(curve_group);
-final:
+
     return ret;
 }
 
-int sm2_uncompress_public_key(const char *in, int in_len, char *out, int *out_len)
+int cb_sm2_uncompress_public_key(const char *pk, char *decompressed_puk)
 {
     EC_GROUP *curve_group = NULL; //
     EC_POINT *point = NULL;
     BIGNUM *x_compressed = NULL;
     int y_chooser_bit = 0;
-    int results = 0;
-    size_t returnsize = 0;
+    int ret = 0;
+    int pk_len = -1;
 
     unsigned char xy[200] = {0};
-    unsigned char x_compressed_byte_array[33] = {0};
+    unsigned char x_compressed_byte_array[CB_SM2_COMPRESS_PUBLICKEY_BYTES] = {0};
 
-    if (in_len != 33) {
-        return -1;
-    }
-
-    if (in[0] == 0x03) {
-	y_chooser_bit = 1;
-    } else if (in[0] == 0x02){
-	y_chooser_bit = 0;
+    if (pk[0] == 0x03) {
+	    y_chooser_bit = 1;
+    } else if (pk[0] == 0x02){
+	    y_chooser_bit = 0;
     } else {
-	return -2;
+	    return -2;
     }
 
-    memcpy(x_compressed_byte_array, in, 33);
+    memcpy(x_compressed_byte_array, pk, CB_SM2_COMPRESS_PUBLICKEY_BYTES);
     x_compressed = BN_new();
 
     if (x_compressed == NULL) {
-	results = -1;
-	goto end;
+	    ret = -1;
+	    goto end;
     }
 
     curve_group = EC_GROUP_new_by_curve_name(NID_sm2p256v1);
     if (curve_group == NULL) {
-	results = -2;
-	goto end;
+	    ret = -2;
+	    goto end;
     }
 
     // create a big number from the unsigned char array
     BN_bin2bn(&x_compressed_byte_array[1], sizeof(x_compressed_byte_array) - 1, x_compressed);
     point = EC_POINT_new(curve_group);
     if (point == NULL) {
-	results = -3;
-	goto end;
+	    ret = -3;
+	    goto end;
     }
     
     //说明：素数域椭圆曲线，给定压缩坐标x和y_bit参数，设置point的几何坐标；用于将Octet-String转化为椭圆曲线上的点；
@@ -152,17 +144,17 @@ int sm2_uncompress_public_key(const char *in, int in_len, char *out, int *out_le
 					    y_chooser_bit, NULL);
 
     if (!EC_POINT_is_on_curve(curve_group, point, NULL)) {
-	results = -4;
-	goto end;
+	    ret = -4;
+	    goto end;
     }
     
-    returnsize = EC_POINT_point2oct(curve_group, point,
+    pk_len = EC_POINT_point2oct(curve_group, point,
 				    POINT_CONVERSION_UNCOMPRESSED,
-				    &xy[0], sizeof(xy), NULL); // 49
+				    decompressed_puk, CB_SM2_PUBLICKEY_BYTES, NULL); // 49
     
-    if (returnsize != 65) {
-	results = -5;
-	goto end;
+    if (pk_len != CB_SM2_PUBLICKEY_BYTES) {
+        ret = -5;
+        goto end;
     }
 
   end:
@@ -170,12 +162,7 @@ int sm2_uncompress_public_key(const char *in, int in_len, char *out, int *out_le
     EC_POINT_free(point);
     EC_GROUP_free(curve_group);
     
-    if (0 == results) {
-        memcpy(out, xy, 65);
-        *out_len = 65;
-    }
-    
-    return results;
+    return ret;
 }
 
 
