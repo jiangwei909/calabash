@@ -22,6 +22,12 @@
 
 #include "calabash/kdf.h"
 
+void cb_kdf_digest_to_key(const char* digest, char* key)
+{
+    for(int i = 0; i< (CB_SM3_DIGEST_BYTES / 2); i++) {
+        key[i] = digest[i] ^ digest[i+16];
+    }
+}
 
 int cb_kdf_derive_from_key(const char* master_key, unsigned int subkey_id, const char* context, unsigned int subkey_size, char* subkey)
 {

@@ -37,12 +37,11 @@ int cb_kx_random_bufpair(const char* pk, char* rnd, char* pk_rnd);
  * @param sk SM2私钥
  * @param rx_rnd 随机数的明文,由服务端提供
  * @param tx_pk_rnd 随机数的密文,由sk对应的公钥加密,由客户端提供
- * @param rx 会话密钥，用于对收到的数据进行解密
- * @param rx 会话密钥，用于对发送的数据进行加密
+ * @param key 会话密钥，用于对数据进行加密解密
  * @return 0成功表示，其他表示失败
  * 
  */
-int cb_kx_svr_session_keys(const char* sk, const char* rx_rnd, const char* tx_pk_rnd, char* rx, char* tx);
+int cb_kx_svr_session_key(const char* sk, const char* rx_rnd, const char* tx_pk_rnd, char* key);
 
 /**
  * @brief 生成客户端的会话密钥
@@ -51,12 +50,11 @@ int cb_kx_svr_session_keys(const char* sk, const char* rx_rnd, const char* tx_pk
  * @param sk SM2私钥
  * @param rx_rnd 随机数的明文,由服务端提供
  * @param tx_rnd 随机数的明文,由客户端提供
- * @param rx 会话密钥，用于对收到的数据进行解密
- * @param rx 会话密钥，用于对发送的数据进行加密
+ * @param rx 会话密钥，用于对数据进行加密解密
  * @return 0成功表示，其他表示失败
  * 
  */
-int cb_kx_clt_session_keys(const char* rx_rnd, const char* tx_rnd, char* rx, char* tx);
+int cb_kx_clt_session_key(const char* rx_rnd, const char* tx_rnd, char* key);
 
 int cb_kx_dh_session_key(const char* sk, const char* peer_pk, char* key);
 

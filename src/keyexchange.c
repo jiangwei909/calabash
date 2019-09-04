@@ -40,7 +40,7 @@ int cb_kx_random_bufpair(const char* pk, char* rnd, char* pk_rnd)
     return 0;
 }
 
-int cb_kx_svr_session_keys(const char* sk, const char* rx_rnd, const char* pk_tx_rnd, char* rx, char* tx)
+int cb_kx_svr_session_key(const char* sk, const char* rx_rnd, const char* pk_tx_rnd, char* key)
 {
     char tx_rnd[CB_KX_RANDOM_BYTES] = { 0x0 };
     int ret = cb_sm2_decrypt(sk, pk_tx_rnd, CB_KX_PK_RANDOM_BYTES, tx_rnd);
@@ -48,10 +48,10 @@ cb_debug("ret=%d\n", ret);
     if (ret != CB_KX_RANDOM_BYTES) return -1;
 
     // 服务端的密钥和客户端的相反，需要调换位置
-    return cb_kx_clt_session_keys(rx_rnd, tx_rnd, tx, rx);
+    return cb_kx_clt_session_key(rx_rnd, tx_rnd, key);
 }
 
-int cb_kx_clt_session_keys(const char* rx_rnd, const char* tx_rnd, char* rx, char* tx)
+int cb_kx_clt_session_key(const char* rx_rnd, const char* tx_rnd, char* key)
 {
     char* head = "3081";
     char tmp[48] = { 0x0 };
@@ -63,8 +63,7 @@ int cb_kx_clt_session_keys(const char* rx_rnd, const char* tx_rnd, char* rx, cha
 
     sm3(tmp, CB_KX_RANDOM_BYTES*2 + 4, digest);
 
-    memcpy(rx, digest, 16);
-    memcpy(tx, digest + 16, 16);
+    cb_kdf_digest_to_key(digest, key);
 
     return 0;
 }

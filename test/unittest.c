@@ -1027,8 +1027,8 @@ int main(int argc, char* argv[]) {
     // test key exchange
     RUN_TEST(test_cb_kx_keypair);
     RUN_TEST(test_cb_kx_random_bufpair);
-    RUN_TEST(test_cb_kx_svr_session_keys);
-    RUN_TEST(test_cb_kx_clt_session_keys);
+    RUN_TEST(test_cb_kx_svr_session_key);
+    RUN_TEST(test_cb_kx_clt_session_key);
     RUN_TEST(test_cb_kx_dh_session_key);
 
     // test sm2

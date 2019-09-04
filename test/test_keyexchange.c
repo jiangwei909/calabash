@@ -34,7 +34,7 @@ void test_cb_kx_random_bufpair()
     TEST_ASSERT_EQUAL_INT(0, ret);
 }
 
-void test_cb_kx_svr_session_keys()
+void test_cb_kx_svr_session_key()
 {
     char* sk = "74F3D6BCC82D29819BC9D9445210B3C581373715E3D728A54580B675C3CD6620";
     char sk_bin[256] = { 0x0 };
@@ -49,11 +49,12 @@ void test_cb_kx_svr_session_keys()
     char tx_key[CB_KX_SESSIONKEY_BYTES] = { 0x0 };
     char* expected_rx_key = "A80DC177593A837C632AD94762ED30AF";
     char* expected_tx_key = "750083D8C43C1C36EA240C15774CCD17";
+    char* expected_key = "DD0D42AF9D069F4A890ED55215A1FDB8";
 
     cb_hex_to_bin(sk, strlen(sk), sk_bin);
     cb_hex_to_bin(pk_tx_rnd_hex, strlen(pk_tx_rnd_hex), pk_tx_rnd);
 
-    int ret = cb_kx_svr_session_keys(sk_bin, rx_rnd, pk_tx_rnd, tx_key, rx_key);
+    int ret = cb_kx_svr_session_key(sk_bin, rx_rnd, pk_tx_rnd, tx_key);
 
 
     TEST_ASSERT_EQUAL_INT(0, ret);
@@ -61,15 +62,15 @@ void test_cb_kx_svr_session_keys()
     char rx_key_hex[CB_KX_SESSIONKEY_BYTES*3] = { 0x0 };
     char tx_key_hex[CB_KX_SESSIONKEY_BYTES*3] = { 0x0 };
 
-    cb_bin_to_hex(rx_key, CB_KX_SESSIONKEY_BYTES, rx_key_hex);
+    //cb_bin_to_hex(rx_key, CB_KX_SESSIONKEY_BYTES, rx_key_hex);
     cb_bin_to_hex(tx_key, CB_KX_SESSIONKEY_BYTES, tx_key_hex);
 
-    TEST_ASSERT_EQUAL_STRING(expected_rx_key, rx_key_hex);
-    TEST_ASSERT_EQUAL_STRING(expected_tx_key, tx_key_hex);
+    //TEST_ASSERT_EQUAL_STRING(expected_rx_key, rx_key_hex);
+    TEST_ASSERT_EQUAL_STRING(expected_key, tx_key_hex);
 
 }
 
-void test_cb_kx_clt_session_keys()
+void test_cb_kx_clt_session_key()
 {
     char* rx_rnd = "12345678ABCDEF01";
     char* tx_rnd = "ABCDEF0112345678";
@@ -77,9 +78,9 @@ void test_cb_kx_clt_session_keys()
     char tx_key[CB_KX_SESSIONKEY_BYTES] = { 0x0 };
     char* expected_rx_key = "A80DC177593A837C632AD94762ED30AF";
     char* expected_tx_key = "750083D8C43C1C36EA240C15774CCD17";
+    char* expected_key = "DD0D42AF9D069F4A890ED55215A1FDB8";
 
-
-    int ret = cb_kx_clt_session_keys(rx_rnd, tx_rnd, rx_key, tx_key);
+    int ret = cb_kx_clt_session_key(rx_rnd, tx_rnd, rx_key);
 
     TEST_ASSERT_EQUAL_INT(0, ret);
 
@@ -87,10 +88,12 @@ void test_cb_kx_clt_session_keys()
     char tx_key_hex[CB_KX_SESSIONKEY_BYTES*3] = { 0x0 };
 
     cb_bin_to_hex(rx_key, CB_KX_SESSIONKEY_BYTES, rx_key_hex);
-    cb_bin_to_hex(tx_key, CB_KX_SESSIONKEY_BYTES, tx_key_hex);
+    //cb_bin_to_hex(tx_key, CB_KX_SESSIONKEY_BYTES, tx_key_hex);
 
-    TEST_ASSERT_EQUAL_STRING(expected_rx_key, rx_key_hex);
-    TEST_ASSERT_EQUAL_STRING(expected_tx_key, tx_key_hex);
+    printf("expected_key=%02X", expected_key[0]);
+
+    TEST_ASSERT_EQUAL_STRING(expected_key, rx_key_hex);
+    //TEST_ASSERT_EQUAL_STRING(expected_tx_key, tx_key_hex);
     
 }
 
