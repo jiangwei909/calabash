@@ -19,6 +19,60 @@
 #include "test_pem.h"
 #include "test_sm3.h"
 
+#define CAKEY_FILEPATH "./cakey.pem"
+#define PUBLICKEY_FILEPATH "./publickey.pem"
+#define RSA_PUBLICKEY_FILEPATH "./rsa_publickey.pem"
+
+void setupdata() 
+{  
+    printf("Setuping data... ");
+
+    char *cakey_data = "-----BEGIN EC PARAMETERS-----\n\
+BggqgRzPVQGCLQ==\n\
+-----END EC PARAMETERS-----\n\
+-----BEGIN EC PRIVATE KEY-----\n\
+MHcCAQEEIHTz1rzILSmBm8nZRFIQs8WBNzcV49copUWAtnXDzWYgoAoGCCqBHM9V\n\
+AYItoUQDQgAEkvd1vCK1W4zL0ri+eOn2TWqnQoPDpRJ/ilDe4QdFan/ijioVwhlA\n\
+j+BRR6jJaP2I16iBeVMPHYNjksAKS0hNzQ==\n\
+-----END EC PRIVATE KEY-----\n";
+
+    char *publickey_data = "-----BEGIN PUBLIC KEY-----\n\
+MFkwEwYHKoZIzj0CAQYIKoEcz1UBgi0DQgAEkvd1vCK1W4zL0ri+eOn2TWqnQoPD\n\
+pRJ/ilDe4QdFan/ijioVwhlAj+BRR6jJaP2I16iBeVMPHYNjksAKS0hNzQ==\n\
+-----END PUBLIC KEY-----\n";
+
+    char *rsa_publickey_data = "-----BEGIN PUBLIC KEY-----\n\
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCm02/TPXXd2sw6fpeMGH/A/Ff+\n\
+oTPHqjdDi+rFCYdLHGIVNtX3RtaeUnpOCktIeiLim8LMjULAr33g4IbOABZFLfkM\n\
+9fRw5qqig49q1NH85KthU9hQdk5re69QN9qaGGsNJ2PP+EOBnFrp8Unb/MuzPK6X\n\
+M80EAgjkaQKZyKloVQIDAQAB\n\
+-----END PUBLIC KEY-----\n";
+
+    FILE *fp = fopen(CAKEY_FILEPATH, "w+");
+    fwrite(cakey_data, 1, strlen(cakey_data), fp);
+    fclose(fp);
+
+    fp = fopen(PUBLICKEY_FILEPATH, "w+");
+    fwrite(publickey_data, 1, strlen(publickey_data), fp);
+    fclose(fp);
+
+    fp = fopen(RSA_PUBLICKEY_FILEPATH, "w+");
+    fwrite(rsa_publickey_data, 1, strlen(rsa_publickey_data), fp);
+    fclose(fp);
+
+    printf("DONE\n");
+}
+
+void cleanup() 
+{
+    printf("Cleanup data...");
+
+    remove(CAKEY_FILEPATH);
+    remove(PUBLICKEY_FILEPATH);
+    remove(RSA_PUBLICKEY_FILEPATH);
+
+    printf("DONE\n");
+}
 
 void test_sm2_compress_public_key()
 {
@@ -1233,6 +1287,8 @@ void test_rsa_transfer_key_pkcs8_to_pkcs1()
 
 int main(int argc, char* argv[]) {
 
+    setupdata();
+
     UNITY_BEGIN();
 
     RUN_TEST(test_sm2_read_pvk_from_pemfile);
@@ -1324,5 +1380,9 @@ int main(int argc, char* argv[]) {
     // test sm3
     RUN_TEST(test_cb_sm3_digest);
 
-    return UNITY_END();
+    cleanup();
+
+    UNITY_END();
+
+    return 0;
 }
