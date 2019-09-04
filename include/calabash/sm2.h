@@ -42,8 +42,8 @@ int cb_sm2_uncompress_public_key(const char *puk, char *decompressed_puk);
 
 int cb_sm2_sign(const char *pvk, const char* id, const char *data, int data_len, char *signature);
 
-int sm2_sign_verify(const unsigned char *puk, int puk_len, const unsigned char *data,
-                    int data_len, const unsigned char *signature, int sig_len);
+int cb_sm2_sign_verify(const unsigned char *puk, const char *id, const unsigned char *data, 
+    int data_len, const unsigned char *signature);
 
 
 /**
