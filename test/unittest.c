@@ -207,56 +207,6 @@ void test_sm2_get_puk_from_pvk()
     TEST_ASSERT_EQUAL_STRING(expected_puk_hex, puk_hex);
 }
 
-void test_sm2_encrypt()
-{
-    char *puk = "92F775BC22B55B8CCBD2B8BE78E9F64D6AA74283C3A5127F8A50DEE107456A7FE28E2A15C219408FE05147A8C968FD88D7A88179530F1D836392C00A4B484DCD";
-    char *plain = "123456781234567812345678123456781234567812345678";
-    char cipher[256] = { 0x0 };
-    int cipher_len = 256;
-    
-    char cipher_hex[8192] = { 0x0 };
-    int cipher_hex_len;
-    int ret = -1;
-
-    char puk_bin[128] = { 0x0 };
-    int puk_bin_len = 0;
-
-    hex_to_bin(puk, strlen(puk), puk_bin, &puk_bin_len);
-    
-    ret = sm2_encrypt(puk_bin, puk_bin_len, plain, strlen(plain), cipher, &cipher_len);
-    TEST_ASSERT_EQUAL_INT(0, ret);
-
-    bin_to_hex(cipher, cipher_len, cipher_hex, &cipher_hex_len);
-
-    printf("Cipher[%d]= %s\n", cipher_len, cipher_hex);
-}
-
-void test_sm2_decrypt()
-{
-    char* pvk="74F3D6BCC82D29819BC9D9445210B3C581373715E3D728A54580B675C3CD6620";
-    char *cipher = "2638566B3F9C15C5AD50C761DC7D101D348646BBD2E460399C743601CBB391AC6565E312433BF44FF1485529C74FE5455BDEF246263575FD756441DE74D25C7A125777432229DFAE221EA66EFA283D4B98577A5D5D2C397E212BE74C13FCC63F5A6BB8AEBCD316D6E7B94467E41055260EEDAD86BC6BD7AEC2AB2AAA738C1B3675076145BAA22B65C0C73D4A933EC591";
-    char *expected_plain = "123456781234567812345678123456781234567812345678";
-    int plain_len = 0;
-    
-    char cipher_hex[8192] = { 0x0 };
-    int cipher_hex_len;
-    int ret = -1;
-
-    char cipher_bin[256] = { 0x0 };
-    int cipher_bin_len;
-    char plain[128] = { 0x0 };
-    char pvk_bin[128] = { 0x0 };
-    int pvk_bin_len = 0;
-
-    hex_to_bin(pvk, strlen(pvk), pvk_bin, &pvk_bin_len);
-    hex_to_bin(cipher, strlen(cipher), cipher_bin, &cipher_bin_len);
-    
-    ret = sm2_decrypt(pvk_bin, pvk_bin_len, cipher_bin, cipher_bin_len, plain, &plain_len);
-    TEST_ASSERT_EQUAL_INT(0, ret);
-
-    TEST_ASSERT_EQUAL_STRING(expected_plain, plain);
-}
-
 void test_remove_format_from_cipher_text()
 {
     char* cipher_text = "308199022060EDC5BAFEDBD1B8774A28314035D6CED587E166FCC399F3166499C7D98054A3022100C60E7506FFABBEFE21FF59AABDC9BC255B7D8F4D4A597506FEF099DC704339A504202FD12F6B82E5E81982EBD68E679E2EEE0E9294604BF147B565C8BC450F0AB5B20430D5CE6D9943D09DA2CF544565C67E867AC23A3AEA4BA51211248D745C5D32894EC0352AF6C8956EE6A640C74F30DDC20D";
@@ -1175,11 +1125,8 @@ int main(int argc, char* argv[]) {
     RUN_TEST(test_sm2_sign_verify);
     RUN_TEST(test_sm2_sign_verify_2);
     RUN_TEST(test_sm2_get_puk_from_pvk);
-    RUN_TEST(test_sm2_encrypt);
-    RUN_TEST(test_sm2_decrypt);
     RUN_TEST(test_remove_format_from_cipher_text);
     RUN_TEST(test_encode_cipher_text);
-
 
     RUN_TEST(test_des_ecb_encrypt);
     RUN_TEST(test_des_ecb_decrypt);

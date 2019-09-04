@@ -80,9 +80,8 @@ int cb_sm2_keypair(char* pk, char* sk);
  *  @param cipher_len 加密后的数据密文长度
  *  @return 成功返回0，否则表示失败
  */
-int sm2_encrypt(const char* puk, int puk_len, const char* plain, int plain_len, char* cipher, int* cipher_len);
-
 int cb_sm2_encrypt(const char* pk, const char* plain, int plain_len, char* cipher);
+
 /**
  *  @brief 使用SM2私钥对数据进行加密
  *  @details 使用SM2私钥对数据进行加密
@@ -95,9 +94,6 @@ int cb_sm2_encrypt(const char* pk, const char* plain, int plain_len, char* ciphe
  *  @param plain_len 解密后的数据明文长度
  *  @return 成功返回0，否则表示失败
  */
-int sm2_decrypt(const char* pvk, int pvk_len, const char* cipher, int cipher_len, char* plain, int* plain_len);
-
-
 int cb_sm2_decrypt(const char* pk, const char* cipher, int cipher_len, char* plain);
 
 /**
