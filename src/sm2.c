@@ -24,6 +24,8 @@
 #include "calabash/sm2.h"
 #include "calabash/utils.h"
 
+#define DEFAULT_ID "1234567812345678"
+
 int cb_sm2_compress_public_key(const char *puk, int puk_len, char *compressed_puk)
 {
     EC_GROUP *curve_group = NULL;
@@ -165,7 +167,7 @@ int cb_sm2_uncompress_public_key(const char *pk, char *decompressed_puk)
     return ret;
 }
 
-int sm2_sign(const char *pvk, int pvk_len, const char *data, int data_len, char *signature, int *signature_len)
+int cb_sm2_sign(const char *pvk, const char *id, const char *data, int data_len, char *signature)
 {
     EVP_PKEY *pkey = NULL;
     EC_KEY *ec_key = NULL;
@@ -177,7 +179,9 @@ int sm2_sign(const char *pvk, int pvk_len, const char *data, int data_len, char 
     int type = NID_sm2p256v1;
     unsigned char dgst[EVP_MAX_MD_SIZE];
     size_t dgstlen = 32;
-    char *id = "1234567812345678";
+    //char *id = "1234567812345678";
+
+    int ret = 0;
 
     ECDSA_SIG *sm2sig = NULL;
     unsigned char sig[256] = {0x0};
@@ -192,7 +196,7 @@ int sm2_sign(const char *pvk, int pvk_len, const char *data, int data_len, char 
     int i;
     unsigned char *tp;
 
-    prv_bn = BN_bin2bn(pvk, pvk_len, NULL);
+    prv_bn = BN_bin2bn(pvk, 32, NULL);
     ec_key = EC_KEY_new_by_curve_name(NID_sm2p256v1);
 
     group = EC_KEY_get0_group(ec_key);
@@ -201,39 +205,42 @@ int sm2_sign(const char *pvk, int pvk_len, const char *data, int data_len, char 
     if (!EC_KEY_set_private_key(ec_key, prv_bn))
     {
         printf("set private key failed.\n");
-        return -1;
+        ret = -1;
+        goto end;
     }
 
     if (!EC_POINT_mul(group, pub_key, prv_bn, NULL, NULL, NULL))
     {
         printf("compute public key failed.\n");
-        return -1;
+        ret = -2;
+        goto end;
     }
 
     if (!EC_KEY_set_public_key(ec_key, pub_key))
     {
         printf("set public key failed.\n");
-        return -1;
+        ret = -3;
+        goto end;
     }
 
-    SM2_compute_message_digest(id_md, msg_md,
-                               (const unsigned char *)data, data_len, id, strlen(id),
+    if (id == NULL) {
+        SM2_compute_message_digest(id_md, msg_md,
+                               (const unsigned char *)data, data_len, DEFAULT_ID, 16,
                                dgst, &dgstlen, ec_key);
+    } else {
+        int id_len = strlen(id);
+        if (id_len > 16) id_len = 16;
 
-#ifdef DEBUG
-    printf("dgst1 = ");
-    for (i = 0; i < dgstlen; i++)
-    {
-        printf("%02X", dgst[i]);
+        SM2_compute_message_digest(id_md, msg_md,
+                               (const unsigned char *)data, data_len, id, id_len,
+                               dgst, &dgstlen, ec_key);
     }
-    printf("\n");
-#endif
 
     siglen = sizeof(sig);
-    if (!SM2_sign(type, dgst, dgstlen, sig, &siglen, ec_key))
-    {
+    if (!SM2_sign(type, dgst, dgstlen, sig, &siglen, ec_key)) {
         fprintf(stderr, "error: %s %d\n", __FUNCTION__, __LINE__);
-        return -1;
+        ret = -4;
+        goto end;
     }
 
     p = sig;
@@ -242,11 +249,11 @@ int sm2_sign(const char *pvk, int pvk_len, const char *data, int data_len, char 
     ECDSA_SIG_get0(sm2sig, &sig_r, &sig_s);
 
     siglen = BN_bn2bin(sig_r, signature);
-    *signature_len = siglen;
-
     siglen = BN_bn2bin(sig_s, signature + siglen);
 
-    *signature_len += siglen;
+end:
+    EC_KEY_free(ec_key);
+    EC_POINT_free(pub_key);
 
     return 0;
 }
@@ -441,7 +448,7 @@ int cb_sm2_keypair(char* pk, char* sk)
 end:
     EC_GROUP_free(curve_group);
     EC_KEY_free(ec_key);
-    
+
     return ret;
 }
 

@@ -215,3 +215,36 @@ void test_cb_sm2_compute_puk()
 
     TEST_ASSERT_EQUAL_STRING(expected_puk_hex, puk_hex);
 }
+
+void test_cb_sm2_sign()
+{
+    char* pvk = "74F3D6BCC82D29819BC9D9445210B3C581373715E3D728A54580B675C3CD6620";
+    char* puk = "92F775BC22B55B8CCBD2B8BE78E9F64D6AA74283C3A5127F8A50DEE107456A7FE28E2A15C219408FE05147A8C968FD88D7A88179530F1D836392C00A4B484DCD";
+    char* message = "hello sm2";
+    char *id = "1234567812345678";
+
+    char pvk_bin[512] = {0x0};
+    int pvk_bin_len;
+    char signature[CB_SM2_SIGNATURE_BYTES] = {0x0};
+    int signature_len = 0;
+
+    char signature_hex[256] = {0x0};
+    int signature_hex_len = 0;
+
+    char message_hex[256] = {0x0};
+    int message_hex_len = 0;
+
+    cb_hex_to_bin(pvk, strlen(pvk), pvk_bin);
+
+    int ret = cb_sm2_sign(pvk_bin, id, message, strlen(message), signature);
+
+    TEST_ASSERT_EQUAL_INT(0, ret);
+
+    cb_bin_to_hex(signature, CB_SM2_SIGNATURE_BYTES, signature_hex);
+    printf("signature[%d] = %s\n", signature_len, signature_hex);
+
+    ret = cb_sm2_sign(pvk_bin, NULL, message, strlen(message), signature);
+
+    TEST_ASSERT_EQUAL_INT(0, ret);
+
+}

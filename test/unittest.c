@@ -74,35 +74,6 @@ void cleanup()
     printf("DONE\n");
 }
 
-void test_sm2_sign()
-{
-    char* pvk = "74F3D6BCC82D29819BC9D9445210B3C581373715E3D728A54580B675C3CD6620";
-    char* puk = "92F775BC22B55B8CCBD2B8BE78E9F64D6AA74283C3A5127F8A50DEE107456A7FE28E2A15C219408FE05147A8C968FD88D7A88179530F1D836392C00A4B484DCD";
-    char* message = "hello sm2";
-
-    char pvk_bin[512] = {0x0};
-    int pvk_bin_len;
-    char signature[128] = {0x0};
-    int signature_len = 0;
-
-    char signature_hex[256] = {0x0};
-    int signature_hex_len = 0;
-
-    char message_hex[256] = {0x0};
-    int message_hex_len = 0;
-
-    hex_to_bin(pvk, strlen(pvk), pvk_bin, &pvk_bin_len);
-    bin_to_hex(message, strlen(message), message_hex, &message_hex_len);
-
-    printf("message hex = %s\n", message_hex);
-
-    sm2_sign(pvk_bin, pvk_bin_len, message, strlen(message), signature, &signature_len);
-
-    bin_to_hex(signature, signature_len, signature_hex, &signature_hex_len);
-    printf("signature[%d] = %s\n", signature_len, signature_hex);
-
-}
-
 void test_sm2_sign_verify()
 {
     char* puk = "92F775BC22B55B8CCBD2B8BE78E9F64D6AA74283C3A5127F8A50DEE107456A7FE28E2A15C219408FE05147A8C968FD88D7A88179530F1D836392C00A4B484DCD";
@@ -1093,7 +1064,6 @@ int main(int argc, char* argv[]) {
     RUN_TEST(test_sm2_read_puk_from_pemfile);
     RUN_TEST(test_sm2_read_puk_from_pem_str);
     
-    RUN_TEST(test_sm2_sign);
     RUN_TEST(test_sm2_sign_verify);
     RUN_TEST(test_sm2_sign_verify_2);
     
@@ -1148,6 +1118,7 @@ int main(int argc, char* argv[]) {
     RUN_TEST(test_cb_sm2_compress_public_key);
     RUN_TEST(test_cb_sm2_uncompress_public_key);
     RUN_TEST(test_cb_sm2_compute_puk);
+    RUN_TEST(test_cb_sm2_sign);
 
     // test secret box
     RUN_TEST(test_cb_secretbox_keygen);

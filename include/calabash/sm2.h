@@ -17,6 +17,7 @@
 #define CB_SM2_SECRETKEY_BYTES 32
 #define CB_SM3_DIGEST_BYTES 32
 #define CB_SM2_COMPRESS_PUBLICKEY_BYTES 33
+#define CB_SM2_SIGNATURE_BYTES 64
 
 /**
  * @brief 压缩SM2国密算法的公钥
@@ -39,8 +40,7 @@ int cb_sm2_compress_public_key(const char *puk, int puk_len, char *compressed_pu
  */
 int cb_sm2_uncompress_public_key(const char *puk, char *decompressed_puk);
 
-int sm2_sign(const char *pvk, int pvk_len, const char *data,
-             int data_len, char *signature, int *signature_len);
+int cb_sm2_sign(const char *pvk, const char* id, const char *data, int data_len, char *signature);
 
 int sm2_sign_verify(const unsigned char *puk, int puk_len, const unsigned char *data,
                     int data_len, const unsigned char *signature, int sig_len);
