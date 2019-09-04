@@ -258,7 +258,7 @@ end:
     return 0;
 }
 
-int sm2_sign_verify(const unsigned char *puk, int puk_len, const unsigned char *data, int data_len, const unsigned char *signature, int sig_len)
+int cb_sm2_sign_verify(const unsigned char *puk, const char *id, const unsigned char *data, int data_len, const unsigned char *signature)
 {
     EC_KEY *ec_key = NULL;
     BIGNUM *x = NULL;
@@ -271,7 +271,7 @@ int sm2_sign_verify(const unsigned char *puk, int puk_len, const unsigned char *
     int type = NID_sm2p256v1;
     unsigned char dgst[EVP_MAX_MD_SIZE];
     size_t dgstlen = 32;
-    char *id = "1234567812345678";
+
     int i = 0;
     ECDSA_SIG *sig = NULL;
     BIGNUM *r = NULL;
@@ -280,70 +280,68 @@ int sm2_sign_verify(const unsigned char *puk, int puk_len, const unsigned char *
     unsigned char *pp_sig = NULL;
     int pp_len = 0;
     unsigned char *tp = NULL;
-    int puk_offset = 0;
+    int puk_offset = 1;
 
-    if (puk_len == 65 && puk[0] == 0x04) {
-	puk_offset = 1;
-    }
-    
     group = EC_GROUP_new_by_curve_name(NID_sm2p256v1);
 
-    if (!(ec_key = EC_KEY_new()))
-    {
+    if (!(ec_key = EC_KEY_new())) {
         ret = -2;
         goto end;
     }
 
-    if (!EC_KEY_set_group(ec_key, group))
-    {
+    if (!EC_KEY_set_group(ec_key, group)) {
         ret = -3;
         goto end;
     }
 
-    if ((x = BN_bin2bn(puk + puk_offset, 32, NULL)) == NULL)
-    {
+    if ((x = BN_bin2bn(puk + puk_offset, 32, NULL)) == NULL) {
         ret = -4;
         goto end;
     }
-    if ((y = BN_bin2bn(puk + puk_offset + 32, 32, NULL)) == NULL)
-    {
+
+    if ((y = BN_bin2bn(puk + puk_offset + 32, 32, NULL)) == NULL) {
         ret = -5;
         goto end;
     }
 
-    if (!EC_KEY_set_public_key_affine_coordinates(ec_key, x, y))
-    {
+    if (!EC_KEY_set_public_key_affine_coordinates(ec_key, x, y)) {
         ret = -6;
         goto end;
     }
 
-    ret = SM2_compute_message_digest(id_md, msg_md,
-                                     data, data_len, id, strlen(id),
-                                     dgst, &dgstlen, ec_key);
+    if (id == NULL) {
+        SM2_compute_message_digest(id_md, msg_md,
+                               (const unsigned char *)data, data_len, DEFAULT_ID, 16,
+                               dgst, &dgstlen, ec_key);
+    } else {
+        int id_len = strlen(id);
+        if (id_len > 16) id_len = 16;
 
-    if ((r = BN_bin2bn(signature, 32, NULL)) == NULL)
-    {
-        ret = -4;
+        SM2_compute_message_digest(id_md, msg_md,
+                               (const unsigned char *)data, data_len, id, id_len,
+                               dgst, &dgstlen, ec_key);
+    }
+
+    if ((r = BN_bin2bn(signature, 32, NULL)) == NULL) {
+        ret = -7;
         goto end;
     }
 
-    if ((s = BN_bin2bn(signature + 32, 32, NULL)) == NULL)
-    {
-        ret = -5;
+    if ((s = BN_bin2bn(signature + 32, 32, NULL)) == NULL) {
+        ret = -8;
         goto end;
     }
 
     pp_len = ECDSA_size(ec_key);
-    if ((pp_sig = OPENSSL_malloc(pp_len)) == NULL)
-    {
+    if ((pp_sig = OPENSSL_malloc(pp_len)) == NULL) {
         fprintf(stderr, "error : %s %d\n", __FUNCTION__, __LINE__);
+        ret = -10;
         goto end;
     }
 
     sig = ECDSA_SIG_new();
 
-    if (!ECDSA_SIG_set0(sig, r, s))
-    {
+    if (!ECDSA_SIG_set0(sig, r, s)) {
         fprintf(stderr, "error : %s %d\n", __FUNCTION__, __LINE__);
         goto end;
     }
@@ -364,6 +362,9 @@ int sm2_sign_verify(const unsigned char *puk, int puk_len, const unsigned char *
     ret = 0;
 
 end:
+    EC_KEY_free(ec_key);
+    EC_GROUP_free(group);
+    ECDSA_SIG_free(sig);
 
     return ret;
 }

@@ -248,3 +248,29 @@ void test_cb_sm2_sign()
     TEST_ASSERT_EQUAL_INT(0, ret);
 
 }
+
+void test_cb_sm2_sign_verify()
+{
+    char* puk = "0492F775BC22B55B8CCBD2B8BE78E9F64D6AA74283C3A5127F8A50DEE107456A7FE28E2A15C219408FE05147A8C968FD88D7A88179530F1D836392C00A4B484DCD";
+    char* message = "hello sm2";
+
+    char puk_bin[512] = {0x0};
+    int puk_bin_len;
+    unsigned char *signature = "CEDD27F1D28B2B9106AB8807A6F29172CDB563B8488681E0CF823A67D01301BDD0D7E17C8A1578876EA0955145A5F72EAFE36389BC73F41AB1650CBE3D9BFA59";
+    int signature_len = 0;
+    char *id = "1234567812345678";
+
+    char signature_bin[256] = {0x0};
+    int signature_bin_len = 0;
+
+    char message_hex[256] = {0x0};
+    int message_hex_len = 0;
+    int ret = -1;
+
+    hex_to_bin(puk, strlen(puk), puk_bin, &puk_bin_len);
+    bin_to_hex(message, strlen(message), message_hex, &message_hex_len);
+    hex_to_bin(signature, strlen(signature), signature_bin, &signature_bin_len);
+
+    ret = cb_sm2_sign_verify(puk_bin, NULL, message, strlen(message), signature_bin);
+    TEST_ASSERT_EQUAL_INT(0, ret);
+}

@@ -74,82 +74,6 @@ void cleanup()
     printf("DONE\n");
 }
 
-void test_sm2_sign_verify()
-{
-    char* puk = "92F775BC22B55B8CCBD2B8BE78E9F64D6AA74283C3A5127F8A50DEE107456A7FE28E2A15C219408FE05147A8C968FD88D7A88179530F1D836392C00A4B484DCD";
-    char* message = "hello sm2";
-
-    char puk_bin[512] = {0x0};
-    int puk_bin_len;
-    unsigned char *signature = "CEDD27F1D28B2B9106AB8807A6F29172CDB563B8488681E0CF823A67D01301BDD0D7E17C8A1578876EA0955145A5F72EAFE36389BC73F41AB1650CBE3D9BFA59";
-    int signature_len = 0;
-
-    char signature_bin[256] = {0x0};
-    int signature_bin_len = 0;
-
-    char message_hex[256] = {0x0};
-    int message_hex_len = 0;
-    int ret;
-
-    hex_to_bin(puk, strlen(puk), puk_bin, &puk_bin_len);
-    bin_to_hex(message, strlen(message), message_hex, &message_hex_len);
-    hex_to_bin(signature, strlen(signature), signature_bin, &signature_bin_len);
-
-    printf("message hex = %s\n", message_hex);
-
-    ret = sm2_sign_verify(puk_bin, puk_bin_len, message, strlen(message), signature_bin, signature_bin_len);
-    printf("ret = %d\n", ret);
-
-    //assert_int_equal(ret, 0);
-}
-
-void test_sm2_sign_verify_2()
-{
-    unsigned char* puk = "359D85951D925C8B4075A2109CAD866C156E3DD977D436FBCF3C8CA035753D4F1C8F96341F1FEB776C9050342231AD0531CC2591425FD92C24A24C3616031731";
-    char* message_hex = "230101000002111700000204040040359D85951D925C8B4075A2109CAD866C156E3DD977D436FBCF3C8CA035753D4F1C8F96341F1FEB776C9050342231AD0531CC2591425FD92C24A24C3616031731";
-
-    unsigned char puk_bin[512] = {0x0};
-    int puk_bin_len;
-    unsigned char *signature = "83F75144BC20623850AFB66FFDB2B60FF91A19D5688AAC50386A14F6AD67244B5F57F01ED43B86421FEAA7D3569D556DE9910E2E15B865CC3104B2AC9256AF10";
-    int signature_len = 0;
-
-    unsigned char signature_bin[256] = {0x0};
-    int signature_bin_len = 0;
-
-    unsigned char message_bin[256] = {0x0};
-    int message_bin_len = 0;
-    int ret;
-
-    hex_to_bin(puk, strlen(puk), puk_bin, &puk_bin_len);
-    hex_to_bin(message_hex, strlen(message_hex), message_bin, &message_bin_len);
-    hex_to_bin(signature, strlen(signature), signature_bin, &signature_bin_len);
-
-    printf("message hex = %s\n", message_hex);
-
-    printf("PUK BIN= ");
-    for(int i = 0; i< puk_bin_len; i++) {
-        printf("%02X", puk_bin[i]);
-    }
-    printf("\n");
-
-    printf("message_bin= ");
-    for(int i = 0; i< message_bin_len; i++) {
-        printf("%02X", message_bin[i]);
-    }
-    printf("\n");
-
-    printf("signature_bin= ");
-    for(int i = 0; i< signature_bin_len; i++) {
-        printf("%02X", signature_bin[i]);
-    }
-    printf("\n");
-
-    ret = sm2_sign_verify(puk_bin, puk_bin_len, message_bin, message_bin_len, signature_bin, signature_bin_len);
-    printf("ret = %d\n", ret);
-
-    //assert_int_equal(ret, 0);
-}
-
 void test_remove_format_from_cipher_text()
 {
     char* cipher_text = "308199022060EDC5BAFEDBD1B8774A28314035D6CED587E166FCC399F3166499C7D98054A3022100C60E7506FFABBEFE21FF59AABDC9BC255B7D8F4D4A597506FEF099DC704339A504202FD12F6B82E5E81982EBD68E679E2EEE0E9294604BF147B565C8BC450F0AB5B20430D5CE6D9943D09DA2CF544565C67E867AC23A3AEA4BA51211248D745C5D32894EC0352AF6C8956EE6A640C74F30DDC20D";
@@ -1064,9 +988,6 @@ int main(int argc, char* argv[]) {
     RUN_TEST(test_sm2_read_puk_from_pemfile);
     RUN_TEST(test_sm2_read_puk_from_pem_str);
     
-    RUN_TEST(test_sm2_sign_verify);
-    RUN_TEST(test_sm2_sign_verify_2);
-    
     RUN_TEST(test_remove_format_from_cipher_text);
     RUN_TEST(test_encode_cipher_text);
 
@@ -1119,6 +1040,7 @@ int main(int argc, char* argv[]) {
     RUN_TEST(test_cb_sm2_uncompress_public_key);
     RUN_TEST(test_cb_sm2_compute_puk);
     RUN_TEST(test_cb_sm2_sign);
+    RUN_TEST(test_cb_sm2_sign_verify);
 
     // test secret box
     RUN_TEST(test_cb_secretbox_keygen);
