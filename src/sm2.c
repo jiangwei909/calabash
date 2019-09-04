@@ -473,37 +473,6 @@ int sm2_read_pvk_from_pemfile(const char* pemfile, char* pvk, int* pvk_len)
     return ret;
 }
 
-
-int sm2_generate_keypair(char* pvk, int* pvk_len, char* puk, int* puk_len)
-{
-    EC_KEY* ec_key = NULL;
-    int ret = -1;
-    const BIGNUM* bn_pvk = NULL;
-    EC_POINT* puk_point = NULL;
-    EC_GROUP *curve_group = NULL;
-    
-    ec_key = EC_KEY_new_by_curve_name(NID_sm2p256v1);    
-
-    ret = EC_KEY_generate_key(ec_key);
-
-    if (ret == 0) return -1;
-
-    bn_pvk = EC_KEY_get0_private_key(ec_key);
-    *pvk_len = BN_bn2bin(bn_pvk, pvk);
-
-    puk_point = EC_KEY_get0_public_key(ec_key);
-
-    curve_group = EC_GROUP_new_by_curve_name(NID_sm2p256v1);
-
-    ret = EC_POINT_point2oct(curve_group, puk_point,
-			     POINT_CONVERSION_UNCOMPRESSED,
-			     puk, 256, NULL);
-
-    *puk_len = ret;
-    
-    return 0;
-}
-
 int cb_sm2_keypair(char* pk, char* sk)
 {
     EC_KEY* ec_key = NULL;
