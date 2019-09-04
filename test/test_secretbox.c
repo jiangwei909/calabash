@@ -42,7 +42,7 @@ void test_cb_secretbox_easy()
 void test_cb_secretbox_open_easy()
 {
     char* sk = "0123456789ABCDEF";
-    char* data = "6E4AFD3DF31C76D1923EB3255349BE8E9F18FEE8F9705EBFC4E53B5B87ACFD84";
+    char* data = "6E4AFD3DF31C76D1923EB3255349BE8E85BE55E1C48538D54F648BD9902A3DBC";
     int data_len = 0;
     data_len = strlen(data);
     char plain[40] = { 0x0 };

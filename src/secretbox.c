@@ -22,6 +22,20 @@
 #include "calabash/utils.h"
 #include "calabash/sm4.h"
 
+#define CB_SECRETBOX_MACKEY_ID 0x2
+#define CB_SECRETBOX_DERIVATION_CONTENT "012345678"
+
+// 按PKCS 5/7 的方式进行填充
+static inline int pkcs_pad_data(char* data, int data_len, int block_size)
+{
+    int padding_len = block_size - data_len % block_size;
+    for(int i = 0; i< padding_len; i++) {
+        data[data_len + i] = (padding_len &0xff);
+    }
+
+    return padding_len;
+}
+
 void cb_secretbox_keygen(char* key)
 {
     RAND_bytes(key, CB_SECRETBOX_KEY_BYTES);
@@ -30,35 +44,39 @@ void cb_secretbox_keygen(char* key)
 int cb_secretbox_easy(const char* sk, const char* data, unsigned int data_len, char* cipher)
 {
     char* plain = NULL;
+    int plain_len = 0;
     unsigned int padding_len = 0;
     char iv[CB_SM4_KEY_BYTES] = { 0x0 };
     char mac_iv[CB_SM4_KEY_BYTES] = { 0x0 };
     char digest[32] = { 0x0 };
     char mac[16] = { 0x0};
+    char mackey[CB_SECRETBOX_KEY_BYTES] = { 0x0};
 
-    padding_len = 16 - (data_len + 8) % 16;
+    // 按最大长度分配内存
+    plain = malloc(data_len + CB_SECRETBOX_NONCE_BYTES + CB_SECRETBOX_BLOCK_BYTES);
 
-    plain = malloc(data_len + 8 + padding_len);
+    // 添加随机数当做头部
+    RAND_bytes(plain, CB_SECRETBOX_NONCE_BYTES);
+    memcpy(plain + CB_SECRETBOX_NONCE_BYTES, data, data_len);
 
-    RAND_bytes(plain, 8);
-    memcpy(plain + 8, data, data_len);
-    for(int i = 0; i< padding_len; i++) {
-        plain[8 + data_len + i] = (padding_len &0xff);
-    }
+    // 填充
+    padding_len = pkcs_pad_data(plain, CB_SECRETBOX_NONCE_BYTES + data_len, CB_SECRETBOX_BLOCK_BYTES);
+    plain_len = CB_SECRETBOX_NONCE_BYTES + data_len + padding_len;
 
-    int cipher_len = cb_sm4_cbc_encrypt(sk, iv, plain, data_len + 8 + padding_len, cipher);
+    int cipher_len = cb_sm4_cbc_encrypt(sk, iv, plain, plain_len, cipher);
 
-    memset(iv, 0x0, CB_SM4_KEY_BYTES);
+    // 计算MAC key
+    cb_kdf_derive_from_key(sk, CB_SECRETBOX_MACKEY_ID, CB_SECRETBOX_DERIVATION_CONTENT, CB_SECRETBOX_KEY_BYTES, mackey);
 
+    // 计算MAC
     cb_sm3_digest(cipher, cipher_len, digest);
-
-    cb_sm4_mac(sk, mac_iv, digest, 32, mac);
+    cb_sm4_mac(mackey, mac_iv, digest, 32, mac);
 
     memcpy(cipher + cipher_len, mac, 16);
 
     free(plain);
 
-    return data_len + 8 + padding_len + 16;
+    return plain_len + CB_SECRETBOX_CBCMAC_BYTES;
 }
 
 int cb_secretbox_open_easy(const char* sk, const char* data, unsigned int data_len, char* plain)
@@ -70,18 +88,21 @@ int cb_secretbox_open_easy(const char* sk, const char* data, unsigned int data_l
     char digest[32] = { 0x0 };
     char mac[16] = { 0x0};
     unsigned int plain_len = 0;
-
-    tmp_plain = malloc(data_len);
+    char mackey[CB_SECRETBOX_KEY_BYTES] = { 0x0};
 
     // step 1, verify mac
-    cb_sm3_digest(data, data_len - CB_SECRETBOX_MAC_BYTES, digest);
+    //  计算MAC key
+    cb_kdf_derive_from_key(sk, CB_SECRETBOX_MACKEY_ID, CB_SECRETBOX_DERIVATION_CONTENT, CB_SECRETBOX_KEY_BYTES, mackey);
 
-    if (cb_sm4_mac_verify(sk, mac_iv, digest, 32, data + data_len - CB_SECRETBOX_MAC_BYTES) != 0 ) {
+    cb_sm3_digest(data, data_len - CB_SECRETBOX_CBCMAC_BYTES, digest);
+
+    if (cb_sm4_mac_verify(mackey, mac_iv, digest, 32, data + data_len - CB_SECRETBOX_CBCMAC_BYTES) != 0 ) {
         return -2;
     }
 
     // step 2, decrypt
-    int tmp_plain_len = cb_sm4_cbc_decrypt(sk, iv, data, data_len - CB_SECRETBOX_MAC_BYTES, tmp_plain);
+    tmp_plain = malloc(data_len);
+    int tmp_plain_len = cb_sm4_cbc_decrypt(sk, iv, data, data_len - CB_SECRETBOX_CBCMAC_BYTES, tmp_plain);
 
     // step 3, erase header and padding
     padding_len = tmp_plain[tmp_plain_len - 1];
