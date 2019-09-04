@@ -39,9 +39,6 @@ int cb_sm2_compress_public_key(const char *puk, int puk_len, char *compressed_pu
  */
 int cb_sm2_uncompress_public_key(const char *puk, char *decompressed_puk);
 
-int sm2_sign_with_pem(const unsigned char *pvk, int pvk_len, const char *data,
-                      int data_len, char *signature, int *len);
-
 int sm2_sign(const char *pvk, int pvk_len, const char *data,
              int data_len, char *signature, int *signature_len);
 
