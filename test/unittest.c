@@ -74,40 +74,7 @@ void cleanup()
     printf("DONE\n");
 }
 
-void test_sm2_compress_public_key()
-{
-    char *puk = "81bf68edf30e4ff2d57545703999d1df6edee63a1fc5f46c8fd768f2a4c2308bb328f1038af1295cbb1a4b29fc2e2ea0e05562e5058d8a94a703f03f9996327d";
-    char *puk2 = "04c3b6d648e13b191c0cb6f754c994c369b5d0842c0e8f5af2e08f9e199ddbf5c88ea2675a7f784506714c29315b55307bd96a3a866566f703f4d86f072421018a";
 
-    int ret = 0;
-    char compressed_puk[128] = { 0x0 };
-    int compressed_puk_len;
-    char *excepted_puk = "0381BF68EDF30E4FF2D57545703999D1DF6EDEE63A1FC5F46C8FD768F2A4C2308B";
-    char *excepted_puk2 = "02C3B6D648E13B191C0CB6F754C994C369B5D0842C0E8F5AF2E08F9E199DDBF5C8";
-
-    char puk_bin[128] = { 0x0};
-    int puk_bin_len;
-    char puk_hex[128] = { 0x0};
-    int puk_hex_len;
-
-    hex_to_bin(puk, strlen(puk), puk_bin, &puk_bin_len);
-
-    ret = sm2_compress_public_key(puk_bin, puk_bin_len, compressed_puk, &compressed_puk_len);
-    TEST_ASSERT_EQUAL_INT(0, ret);
-
-    bin_to_hex(compressed_puk, compressed_puk_len, puk_hex, &puk_bin_len);
-    TEST_ASSERT_EQUAL_STRING(excepted_puk, puk_hex);
-
-    //assert_string_equal(puk_hex, excepted_puk);
-
-    hex_to_bin(puk2, strlen(puk2), puk_bin, &puk_bin_len);
-
-    ret = sm2_compress_public_key(puk_bin, puk_bin_len, compressed_puk, &compressed_puk_len);
-    TEST_ASSERT_EQUAL_INT(0, ret);
-
-    bin_to_hex(compressed_puk, compressed_puk_len, puk_hex, &puk_bin_len);
-    TEST_ASSERT_EQUAL_STRING(excepted_puk2, puk_hex);
-}
 
 void test_uncompress_public_key()
 {
@@ -1297,7 +1264,7 @@ int main(int argc, char* argv[]) {
     RUN_TEST(test_sm2_read_puk_from_pemfile);
     RUN_TEST(test_sm2_read_puk_from_pem_str);
     
-    RUN_TEST(test_sm2_compress_public_key);
+    
     RUN_TEST(test_uncompress_public_key);
     RUN_TEST(test_sm2_sign_with_pem);
     RUN_TEST(test_sm2_sign);
@@ -1356,6 +1323,7 @@ int main(int argc, char* argv[]) {
     RUN_TEST(test_cb_sm2_encrypt);
     RUN_TEST(test_cb_sm2_decrypt);
     RUN_TEST(test_cb_sm2_compute_key);
+    RUN_TEST(test_cb_sm2_compress_public_key);
 
     // test secret box
     RUN_TEST(test_cb_secretbox_keygen);

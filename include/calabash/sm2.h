@@ -16,7 +16,7 @@
 #define CB_SM2_PUBLICKEY_BYTES 65
 #define CB_SM2_SECRETKEY_BYTES 32
 #define CB_SM3_DIGEST_BYTES 32
-
+#define CB_SM2_COMPRESS_PUBLICKEY_BYTES 33
 
 /**
  * @brief 压缩SM2国密算法的公钥

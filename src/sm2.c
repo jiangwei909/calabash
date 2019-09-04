@@ -24,16 +24,16 @@
 #include "calabash/sm2.h"
 #include "calabash/utils.h"
 
-int sm2_compress_public_key(const char *puk, int puk_len,
+int cb_sm2_compress_public_key(const char *puk, int puk_len,
                             char *compressed_puk, int *compressed_puk_len)
 {
     EC_GROUP *curve_group = NULL;
     EC_POINT *point = NULL;
     BIGNUM *xy = NULL;
-    BIGNUM *x;
-    BIGNUM *y;
+    BIGNUM *x = NULL;
+    BIGNUM *y = NULL;
     unsigned char buff[128] = {0x0};
-    int result = 0;
+    int ret = 0;
     int puk_offset = 0;
 
     if (puk_len != 64 && puk_len != 65) {
@@ -50,11 +50,21 @@ int sm2_compress_public_key(const char *puk, int puk_len,
 
     curve_group = EC_GROUP_new_by_curve_name(NID_sm2p256v1);
 
-    if (curve_group == NULL)
-    {
-        result = -2;
-        return result;
+    if (curve_group == NULL) {
+        return -2;
     }
+
+    point = EC_POINT_new(curve_group);
+    if (point == NULL) {
+        ret = -3;
+        goto group_free;
+    }
+
+    if (!EC_POINT_is_on_curve(curve_group, point, NULL)) {
+        ret = -4;
+        goto point_free;
+    }
+
     xy = BN_new();
     x = BN_new();
     y = BN_new();
@@ -64,35 +74,30 @@ int sm2_compress_public_key(const char *puk, int puk_len,
     BN_bin2bn(puk + puk_offset, 32, x);
     BN_bin2bn(puk + puk_offset + 32, 32, y);
 
-    point = EC_POINT_new(curve_group);
-    if (point == NULL)
-    {
-        result = -3;
-        return result;
+    if (!EC_POINT_set_affine_coordinates_GFp(curve_group, point, x, y, NULL)) {
+        ret = -5;
+        goto bn_free;
     }
 
-    if (!EC_POINT_set_affine_coordinates_GFp(curve_group, point, x, y, NULL))
-    {
-        return -5;
-    }
-
-    if (!EC_POINT_is_on_curve(curve_group, point, NULL))
-    {
-        return -4;
-    }
-
-    if ((result = EC_POINT_point2oct(curve_group, point,
+    if ((ret = EC_POINT_point2oct(curve_group, point,
                                      POINT_CONVERSION_COMPRESSED,
-                                     buff, sizeof(buff), NULL)) != 33)
+                                     compressed_puk, CB_SM2_COMPRESS_PUBLICKEY_BYTES, NULL)) != CB_SM2_COMPRESS_PUBLICKEY_BYTES)
     {
-        return -6;
+        ret = -6;
+    } else {
+        ret = 0;
     }
 
-    memcpy(compressed_puk, buff, result);
-
-    *compressed_puk_len = result;
-
-    return 0;
+bn_free:
+    BN_free(xy);
+    BN_free(x);
+    BN_free(y);
+point_free:
+    EC_POINT_free(point);
+group_free:
+    EC_GROUP_free(curve_group);
+final:
+    return ret;
 }
 
 int sm2_uncompress_public_key(const char *in, int in_len, char *out, int *out_len)
