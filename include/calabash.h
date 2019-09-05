@@ -22,5 +22,6 @@
 #include "calabash/pem.h"
 #include "calabash/keyexchange.h"
 #include "calabash/secretbox.h"
+#include "calabash/publicbox.h"
 
 #endif //CALABASH_H

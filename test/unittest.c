@@ -18,6 +18,7 @@
 #include "test_kdf.h"
 #include "test_pem.h"
 #include "test_sm3.h"
+#include "test_publicbox.h"
 
 #define CAKEY_FILEPATH "./cakey.pem"
 #define PUBLICKEY_FILEPATH "./publickey.pem"
@@ -1064,6 +1065,10 @@ int main(int argc, char* argv[]) {
 
     // test sm3
     RUN_TEST(test_cb_sm3_digest);
+
+    // test publicbox
+    RUN_TEST(test_cb_publicbox_seal);
+    RUN_TEST(test_cb_publicbox_seal_open);
 
     cleanup();
 
