@@ -71,11 +71,9 @@ int cb_kx_dh_session_key(const char* sk, const char* peer_pk, char* key)
     char tk[32] = { 0x0 };
     int ret = -1;
 
-    ret = cb_sm2_compute_key(sk, peer_pk, tk);
-
-    if (ret != 32 ) return -1;
-
-    memcpy(key, tk, CB_KX_SESSIONKEY_BYTES);
+    ret = cb_sm2_compute_key(sk, peer_pk, key);
+    cb_debug("ret = %d\n", ret);
+    if (ret != CB_KX_SESSIONKEY_BYTES ) return -1;
 
     return CB_KX_SESSIONKEY_BYTES;
 }
