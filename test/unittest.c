@@ -19,6 +19,7 @@
 #include "test_pem.h"
 #include "test_sm3.h"
 #include "test_publicbox.h"
+#include "test_utils.h"
 
 #define CAKEY_FILEPATH "./cakey.pem"
 #define PUBLICKEY_FILEPATH "./publickey.pem"
@@ -74,7 +75,7 @@ void cleanup()
 
     printf("DONE\n");
 }
-
+/*
 void test_remove_format_from_cipher_text()
 {
     char* cipher_text = "308199022060EDC5BAFEDBD1B8774A28314035D6CED587E166FCC399F3166499C7D98054A3022100C60E7506FFABBEFE21FF59AABDC9BC255B7D8F4D4A597506FEF099DC704339A504202FD12F6B82E5E81982EBD68E679E2EEE0E9294604BF147B565C8BC450F0AB5B20430D5CE6D9943D09DA2CF544565C67E867AC23A3AEA4BA51211248D745C5D32894EC0352AF6C8956EE6A640C74F30DDC20D";
@@ -403,11 +404,7 @@ M80EAgjkaQKZyKloVQIDAQAB \n\
     char pvk_hex[2128] = { 0x0 };
     int pvk_hex_len = 0;
     char* expected_pvk = "30819F300D06092A864886F70D010101050003818D0030818902818100A6D36FD33D75DDDACC3A7E978C187FC0FC57FEA133C7AA37438BEAC509874B1C621536D5F746D69E527A4E0A4B487A22E29BC2CC8D42C0AF7DE0E086CE0016452DF90CF5F470E6AAA2838F6AD4D1FCE4AB6153D850764E6B7BAF5037DA9A186B0D2763CFF843819C5AE9F149DBFCCBB33CAE9733CD040208E4690299C8A968550203010001";
-/*
-    FILE* fp = fopen(pemfile, "r");
-    int s = fread(pem_str, 1, 1024, fp);
-    fclose(fp);
-*/  
+
     pvk_len = rsa_read_key_from_pem_str(pem_str, strlen(pem_str), pvk);
 
     TEST_ASSERT_EQUAL_INT(162, pvk_len);
@@ -575,11 +572,7 @@ void test_bas64_to_bin()
     char pvk_hex[2128] = { 0x0 };
     int pvk_hex_len = 0;
     char* expected_pvk = "30819F300D06092A864886F70D010101050003818D0030818902818100A6D36FD33D75DDDACC3A7E978C187FC0FC57FEA133C7AA37438BEAC509874B1C621536D5F746D69E527A4E0A4B487A22E29BC2CC8D42C0AF7DE0E086CE0016452DF90CF5F470E6AAA2838F6AD4D1FCE4AB6153D850764E6B7BAF5037DA9A186B0D2763CFF843819C5AE9F149DBFCCBB33CAE9733CD040208E4690299C8A968550203010001";
-/*
-    FILE* fp = fopen(pemfile, "r");
-    int s = fread(pem_str, 1, 1024, fp);
-    fclose(fp);
-*/  
+
     pvk_len = base64_to_bin(pem_str, strlen(pem_str), pvk);
 
     TEST_ASSERT_EQUAL_INT(162, pvk_len);
@@ -943,15 +936,7 @@ void test_rsa_dump_pvk_to_pkcs8_pem_file_with_password()
     
     TEST_ASSERT_NOT_EQUAL(-1, ret);
 
-    /*
-    FILE* fp = fopen(file_name, "r");
-    if (fp == NULL) TEST_ASSERT_EQUAL(0, -1);
 
-    int r = fread(buff, 1, 2024, fp);
-    fclose(fp);
-
-    TEST_ASSERT_EQUAL_STRING(expected_pvk, buff);
-    */
     remove(file_name);
 }
 
@@ -976,13 +961,13 @@ void test_rsa_transfer_key_pkcs8_to_pkcs1()
 
     TEST_ASSERT_EQUAL_STRING(expected_pkcs1_key_hex, pkcs1_key_hex);
 }
-
+*/
 int main(int argc, char* argv[]) {
 
     setupdata();
 
     UNITY_BEGIN();
-
+/*
     RUN_TEST(test_sm2_read_pvk_from_pemfile);
     RUN_TEST(test_sm2_read_pvk_from_pem_str);
     
@@ -1024,24 +1009,35 @@ int main(int argc, char* argv[]) {
     RUN_TEST(test_rsa_dump_pvk_to_pkcs8_pem_file_with_password);
 
     RUN_TEST(test_rsa_transfer_key_pkcs8_to_pkcs1);
+*/    
+    // test utils
+    RUN_TEST(test_cb_ut_decode_ec_sign_str);
+    RUN_TEST(test_cb_ut_encode_ec_sign_str);
+    RUN_TEST(test_cb_ut_encode_ec_cipher_str);
+
+    // test sm2
+    RUN_TEST(test_cb_sm2_keypair); 
+    RUN_TEST(test_cb_sm2_encrypt);
+    RUN_TEST(test_cb_sm2_decrypt);
+
+    RUN_TEST(test_cb_sm2_compute_key);
     
+    RUN_TEST(test_cb_sm2_compress_public_key);
+    RUN_TEST(test_cb_sm2_uncompress_public_key);
+
+    RUN_TEST(test_cb_sm2_get_puk_from_pvk);
+    
+    RUN_TEST(test_cb_sm2_sign);
+    RUN_TEST(test_cb_sm2_sign_verify);
+
     // test key exchange
+
     RUN_TEST(test_cb_kx_keypair);
     RUN_TEST(test_cb_kx_random_bufpair);
     RUN_TEST(test_cb_kx_svr_session_key);
     RUN_TEST(test_cb_kx_clt_session_key);
     RUN_TEST(test_cb_kx_dh_session_key);
 
-    // test sm2
-    RUN_TEST(test_cb_sm2_keypair);
-    RUN_TEST(test_cb_sm2_encrypt);
-    RUN_TEST(test_cb_sm2_decrypt);
-    RUN_TEST(test_cb_sm2_compute_key);
-    RUN_TEST(test_cb_sm2_compress_public_key);
-    RUN_TEST(test_cb_sm2_uncompress_public_key);
-    RUN_TEST(test_cb_sm2_compute_puk);
-    RUN_TEST(test_cb_sm2_sign);
-    RUN_TEST(test_cb_sm2_sign_verify);
 
     // test secret box
     RUN_TEST(test_cb_secretbox_keygen);
@@ -1069,7 +1065,7 @@ int main(int argc, char* argv[]) {
     // test publicbox
     RUN_TEST(test_cb_publicbox_seal);
     RUN_TEST(test_cb_publicbox_seal_open);
-
+    
     cleanup();
 
     UNITY_END();

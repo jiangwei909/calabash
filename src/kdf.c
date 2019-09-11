@@ -15,8 +15,6 @@
 #include <openssl/evp.h>
 #include <openssl/bn.h>
 #include <openssl/ec.h>
-#include <openssl/gmapi.h>
-#include <openssl/sms4.h>
 
 #include "calabash/sm2.h"
 

@@ -15,8 +15,6 @@
 #include <openssl/evp.h>
 #include <openssl/bn.h>
 #include <openssl/ec.h>
-#include <openssl/gmapi.h>
-#include <openssl/sms4.h>
 
 #include "calabash/keyexchange.h"
 #include "calabash/utils.h"
@@ -44,7 +42,7 @@ int cb_kx_svr_session_key(const char* sk, const char* rx_rnd, const char* pk_tx_
 {
     char tx_rnd[CB_KX_RANDOM_BYTES] = { 0x0 };
     int ret = cb_sm2_decrypt(sk, pk_tx_rnd, CB_KX_PK_RANDOM_BYTES, tx_rnd);
-cb_debug("ret=%d\n", ret);
+    cb_debug("ret=%d %d\n", CB_KX_PK_RANDOM_BYTES, ret);
     if (ret != CB_KX_RANDOM_BYTES) return -1;
 
     // 服务端的密钥和客户端的相反，需要调换位置
@@ -61,8 +59,8 @@ int cb_kx_clt_session_key(const char* rx_rnd, const char* tx_rnd, char* key)
     memcpy(tmp + 4, rx_rnd, CB_KX_RANDOM_BYTES);
     memcpy(tmp + 4 + CB_KX_RANDOM_BYTES, tx_rnd, CB_KX_RANDOM_BYTES);
 
-    sm3(tmp, CB_KX_RANDOM_BYTES*2 + 4, digest);
-
+    cb_sm3_digest(tmp, CB_KX_RANDOM_BYTES*2 + 4, digest);
+    cb_debug("digest data len = %d\n", CB_KX_RANDOM_BYTES*2 + 4);
     cb_kdf_digest_to_key(digest, key);
 
     return 0;

@@ -15,8 +15,6 @@
 #include <openssl/evp.h>
 #include <openssl/bn.h>
 #include <openssl/ec.h>
-#include <openssl/gmapi.h>
-#include <openssl/sms4.h>
 
 #include "calabash/secretbox.h"
 #include "calabash/utils.h"
@@ -51,7 +49,8 @@ int cb_secretbox_easy(const char* sk, const char* data, unsigned int data_len, c
     char digest[32] = { 0x0 };
     char mac[16] = { 0x0};
     char mackey[CB_SECRETBOX_KEY_BYTES] = { 0x0};
-
+    int ret = 0;
+    
     // 按最大长度分配内存
     plain = malloc(data_len + CB_SECRETBOX_NONCE_BYTES + CB_SECRETBOX_BLOCK_BYTES);
 
@@ -64,7 +63,11 @@ int cb_secretbox_easy(const char* sk, const char* data, unsigned int data_len, c
     plain_len = CB_SECRETBOX_NONCE_BYTES + data_len + padding_len;
 
     int cipher_len = cb_sm4_cbc_encrypt(sk, iv, plain, plain_len, cipher);
-
+    if (cipher_len < 0) {
+	ret =  -1;
+	goto end;
+    }
+    
     // 计算MAC key
     cb_kdf_derive_from_key(sk, CB_SECRETBOX_MACKEY_ID, CB_SECRETBOX_DERIVATION_CONTENT, CB_SECRETBOX_KEY_BYTES, mackey);
 
@@ -74,9 +77,11 @@ int cb_secretbox_easy(const char* sk, const char* data, unsigned int data_len, c
 
     memcpy(cipher + cipher_len, mac, 16);
 
+    ret = plain_len + CB_SECRETBOX_CBCMAC_BYTES;
+  end:
     free(plain);
-
-    return plain_len + CB_SECRETBOX_CBCMAC_BYTES;
+    
+    return ret;
 }
 
 int cb_secretbox_open_easy(const char* sk, const char* data, unsigned int data_len, char* plain)
@@ -89,7 +94,8 @@ int cb_secretbox_open_easy(const char* sk, const char* data, unsigned int data_l
     char mac[16] = { 0x0};
     unsigned int plain_len = 0;
     char mackey[CB_SECRETBOX_KEY_BYTES] = { 0x0};
-
+    int ret = 0;
+    
     // step 1, verify mac
     //  计算MAC key
     cb_kdf_derive_from_key(sk, CB_SECRETBOX_MACKEY_ID, CB_SECRETBOX_DERIVATION_CONTENT, CB_SECRETBOX_KEY_BYTES, mackey);
@@ -104,6 +110,11 @@ int cb_secretbox_open_easy(const char* sk, const char* data, unsigned int data_l
     tmp_plain = malloc(data_len);
     int tmp_plain_len = cb_sm4_cbc_decrypt(sk, iv, data, data_len - CB_SECRETBOX_CBCMAC_BYTES, tmp_plain);
 
+    if (tmp_plain_len < 0) {
+	ret = -1;
+	goto end;
+    }
+    
     // step 3, erase header and padding
     padding_len = tmp_plain[tmp_plain_len - 1];
 
@@ -111,27 +122,32 @@ int cb_secretbox_open_easy(const char* sk, const char* data, unsigned int data_l
 
     // step 4
     memcpy(plain, tmp_plain + 8, plain_len);
-
+    ret = plain_len;
+    
+  end:
     free(tmp_plain);
 
-    return plain_len;
+    return ret;
 }
 
 int cb_secretbox_auth(const char* sk, const char* data, unsigned int data_len, char* mac)
 {
+    int md_len = 0;
+    
+    HMAC(EVP_sm3(), sk, CB_SECRETBOX_KEY_BYTES, data, data_len, mac, &md_len);
 
-    sm3_hmac(data, data_len, sk, CB_SECRETBOX_KEY_BYTES, mac);
-
-    return SM3_HMAC_SIZE;
+    return md_len;
 }
 
 int cb_secretbox_auth_verify(const char* sk, const char* data, unsigned int data_len, const char* mac)
 {
-    char actual_mac[SM3_HMAC_SIZE] = { 0x0 };
+    int md_len = 0;
+    char actual_mac[32] = { 0x0 };
 
-    sm3_hmac(data, data_len, sk, CB_SECRETBOX_KEY_BYTES, actual_mac);
-
-    for(int i = 0; i< SM3_HMAC_SIZE; i++) {
+    //sm3_hmac(data, data_len, sk, CB_SECRETBOX_KEY_BYTES, actual_mac);
+    HMAC(EVP_sm3(), sk, CB_SECRETBOX_KEY_BYTES, data, data_len, actual_mac, &md_len);
+    
+    for(int i = 0; i< 32; i++) {
         if (actual_mac[i] != mac[i]) return -1;
     }
 

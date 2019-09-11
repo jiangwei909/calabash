@@ -4,10 +4,30 @@
 #include <stddef.h>
 #include <setjmp.h>
 
+#include <string.h>
+#include <stdlib.h>
+
+#ifdef WIN32
+#include <io.h>
+#else
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#endif // WIN32
+
+#include <openssl/bio.h>
+#include <openssl/pem.h>
+#include <openssl/evp.h>
+#include <openssl/bn.h>
+#include <openssl/ec.h>
+#include <openssl/err.h>
+
 #include "calabash.h"
 #include "unity/unity.h"
 
 #include "test_sm2.h"
+
 
 void test_cb_sm2_keypair()
 {
@@ -24,7 +44,10 @@ void test_cb_sm2_keypair()
 
 void test_cb_sm2_encrypt()
 {
-    char *pk = "0492F775BC22B55B8CCBD2B8BE78E9F64D6AA74283C3A5127F8A50DEE107456A7FE28E2A15C219408FE05147A8C968FD88D7A88179530F1D836392C00A4B484DCD";
+    char *pk = "92F775BC22B55B8CCBD2B8BE78E9F64D6AA74283C3A5127F8A50DEE107456A7FE28E2A15C219408FE05147A8C968FD88D7A88179530F1D836392C00A4B484DCD";
+    //char *pk = "8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a";
+    char *pk2 = "0492F775BC22B55B8CCBD2B8BE78E9F64D6AA74283C3A5127F8A50DEE107456A7FE28E2A15C219408FE05147A8C968FD88D7A88179530F1D836392C00A4B484DCD";
+    
     char *plain = "123456781234567812345678123456781234567812345678";
     // char *plain = "ABCDEF0112345678";
 
@@ -45,8 +68,15 @@ void test_cb_sm2_encrypt()
     //char cipher_hex[8192] = { 0x0 };
     cb_bin_to_hex(cipher, ret, cipher_hex);
 
-    printf("cipher len=%d cipher=%s\n", ret, cipher_hex);
+    TEST_ASSERT_EQUAL_INT(144, ret);
 
+    hex_to_bin(pk2, strlen(pk2), puk_bin, &puk_bin_len);
+    
+    ret = cb_sm2_encrypt(puk_bin, plain, strlen(plain), cipher);
+
+    //char cipher_hex[8192] = { 0x0 };
+    cb_bin_to_hex(cipher, ret, cipher_hex);
+    cipher_len = 3 + cipher[2] &0xff;
     TEST_ASSERT_EQUAL_INT(144, ret);
 
 }
@@ -55,6 +85,7 @@ void test_cb_sm2_decrypt()
 {
     char* sk="74F3D6BCC82D29819BC9D9445210B3C581373715E3D728A54580B675C3CD6620";
     char *cipher = "2638566B3F9C15C5AD50C761DC7D101D348646BBD2E460399C743601CBB391AC6565E312433BF44FF1485529C74FE5455BDEF246263575FD756441DE74D25C7A125777432229DFAE221EA66EFA283D4B98577A5D5D2C397E212BE74C13FCC63F5A6BB8AEBCD316D6E7B94467E41055260EEDAD86BC6BD7AEC2AB2AAA738C1B3675076145BAA22B65C0C73D4A933EC591";
+    /* char *cipher = "308198022067251A433D497B1761BB2433F163025CD04AEE2D70E18BFB332126C2C0DA992002200422314276F5E701262298D721D96F027DF03FCA8B0D1A19E6FA6BCFBE3F3E740420CF479D4ACDC1DA5FB71B1A760CFFC5A21655BBFD3FAF8A526F7CB0D250F9116604303AE9964F46CFE3007B83E9DC60EAB88421111F0DF016391A49F3B4BBC1F33CDCF0E0DD9CE6B79865778315F64E8B1BC9"; */
     char *expected_plain = "123456781234567812345678123456781234567812345678";
     int plain_len = 0;
     
@@ -64,8 +95,8 @@ void test_cb_sm2_decrypt()
 
     char cipher_bin[256] = { 0x0 };
     int cipher_bin_len;
-    char plain[128] = { 0x0 };
-    char pvk_bin[128] = { 0x0 };
+    unsigned char plain[1024] = { 0x0 };
+    char pvk_bin[1024] = { 0x0 };
     int pvk_bin_len = 0;
 
     hex_to_bin(sk, strlen(sk), pvk_bin, &pvk_bin_len);
@@ -73,6 +104,7 @@ void test_cb_sm2_decrypt()
     
     plain_len = cb_sm2_decrypt(pvk_bin, cipher_bin, cipher_bin_len, plain);
     TEST_ASSERT_EQUAL_INT(48, plain_len);
+    plain[plain_len] = 0x0;
 
     TEST_ASSERT_EQUAL_STRING(expected_plain, plain);
 }
@@ -97,7 +129,7 @@ void test_cb_sm2_compute_key()
 
     int ret = cb_sm2_compute_key(pvk_bin, puk_bin, key);
 
-    TEST_ASSERT_EQUAL_INT(32, ret);
+    TEST_ASSERT_EQUAL_INT(16, ret);
 
     cb_bin_to_hex(key, ret, key_hex);
     cb_debug("key hex=%s", key_hex);
@@ -112,7 +144,7 @@ void test_cb_sm2_compute_key()
     cb_bin_to_hex(key2, ret, key2_hex);
     cb_debug("key2 hex=%s", key2_hex);
 
-    TEST_ASSERT_EQUAL_INT(32, ret);
+    TEST_ASSERT_EQUAL_INT(16, ret);
     TEST_ASSERT_EQUAL_STRING(key_hex, key2_hex);
 }
 
@@ -188,7 +220,7 @@ void test_cb_sm2_uncompress_public_key()
 }
 
 
-void test_cb_sm2_compute_puk()
+void test_cb_sm2_get_puk_from_pvk()
 {
     char puk[144] = { 0x0 };
     char* pvk = "74F3D6BCC82D29819BC9D9445210B3C581373715E3D728A54580B675C3CD6620";
@@ -208,7 +240,7 @@ void test_cb_sm2_compute_puk()
 
     cb_hex_to_bin(pvk, 64, pvk_bin);
     
-    ret = cb_sm2_compute_puk(pvk_bin, puk);
+    ret = cb_sm2_get_puk_from_pvk(pvk_bin, puk);
     TEST_ASSERT_EQUAL_INT(0, ret);
 
     cb_bin_to_hex(puk, puk_len, puk_hex);
@@ -219,7 +251,6 @@ void test_cb_sm2_compute_puk()
 void test_cb_sm2_sign()
 {
     char* pvk = "74F3D6BCC82D29819BC9D9445210B3C581373715E3D728A54580B675C3CD6620";
-    char* puk = "92F775BC22B55B8CCBD2B8BE78E9F64D6AA74283C3A5127F8A50DEE107456A7FE28E2A15C219408FE05147A8C968FD88D7A88179530F1D836392C00A4B484DCD";
     char* message = "hello sm2";
     char *id = "1234567812345678";
 
@@ -238,14 +269,12 @@ void test_cb_sm2_sign()
 
     int ret = cb_sm2_sign(pvk_bin, id, message, strlen(message), signature);
 
-    TEST_ASSERT_EQUAL_INT(0, ret);
+    // TEST_ASSERT_EQUAL_INT(0, ret);
 
-    cb_bin_to_hex(signature, CB_SM2_SIGNATURE_BYTES, signature_hex);
-    printf("signature[%d] = %s\n", signature_len, signature_hex);
+    cb_bin_to_hex(signature, ret, signature_hex);
+    cb_debug("signature[%d] = %s\n", ret, signature_hex);
 
-    ret = cb_sm2_sign(pvk_bin, NULL, message, strlen(message), signature);
-
-    TEST_ASSERT_EQUAL_INT(0, ret);
+    TEST_ASSERT_EQUAL_INT(64, ret);
 
 }
 
@@ -257,6 +286,7 @@ void test_cb_sm2_sign_verify()
     char puk_bin[512] = {0x0};
     int puk_bin_len;
     unsigned char *signature = "CEDD27F1D28B2B9106AB8807A6F29172CDB563B8488681E0CF823A67D01301BDD0D7E17C8A1578876EA0955145A5F72EAFE36389BC73F41AB1650CBE3D9BFA59";
+    unsigned char *signature2 = "3045022100BB43CFF29D25CEFC01B0E1318725DC19FDD26C794B920CEEE8E16548055CD53402201925E8434F63DB7C489EDFB2B1B27ED160A4B94BEF1F626683C2B959D554CC56";
     int signature_len = 0;
     char *id = "1234567812345678";
 

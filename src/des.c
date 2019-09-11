@@ -15,7 +15,7 @@
 #include <openssl/evp.h>
 #include <openssl/bn.h>
 #include <openssl/ec.h>
-#include <openssl/gmapi.h>
+
 #include <openssl/des.h>
 
 #include "calabash/des.h"

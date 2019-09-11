@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 3.6)
 project(calabash VERSION 0.8.0)
 
 IF (CMAKE_BUILD_TYPE MATCHES "Debug")
-    add_definitions(-DDEBUG)
+  add_definitions(-DDEBUG -Wall)
+  SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g -ggdb")
 ENDIF()
 
 configure_file (
@@ -18,14 +19,12 @@ if (OPENSSL_ROOT)
   include_directories ("${OPENSSL_ROOT}/include")
 
   if (WIN32)
-    set(SSL_SUB_DIR win)
     set (EXTRA_LIBS ${EXTRA_LIBS} libcrypto)
   else()
-    set(SSL_SUB_DIR linux)
     set (EXTRA_LIBS ${EXTRA_LIBS} crypto)
   endif(WIN32)
 
-  link_directories ("${OPENSSL_ROOT}/build/${SSL_SUB_DIR}")
+  link_directories ("${OPENSSL_ROOT}/")
   
 endif (OPENSSL_ROOT)
 
@@ -34,6 +33,7 @@ add_subdirectory (test)
 aux_source_directory(src/ SOURCE_FILES)
 
 add_library(calabash SHARED ${SOURCE_FILES})
+
 #target_link_libraries(calabash libcrypto)
 target_link_libraries (${PROJECT_NAME}  ${EXTRA_LIBS})
 

@@ -46,7 +46,8 @@ void test_cb_kx_svr_session_key()
     char pk_tx_rnd[CB_KX_PK_RANDOM_BYTES] = { 0x0 };
 
     char rx_key[CB_KX_SESSIONKEY_BYTES] = { 0x0 };
-    char tx_key[CB_KX_SESSIONKEY_BYTES] = { 0x0 };
+    //char tx_key[CB_KX_SESSIONKEY_BYTES] = { 0x0 };
+    char tx_key[128] = { 0x0 };
     char* expected_rx_key = "A80DC177593A837C632AD94762ED30AF";
     char* expected_tx_key = "750083D8C43C1C36EA240C15774CCD17";
     char* expected_key = "DD0D42AF9D069F4A890ED55215A1FDB8";

@@ -18,6 +18,7 @@
 #define CB_SM3_DIGEST_BYTES 32
 #define CB_SM2_COMPRESS_PUBLICKEY_BYTES 33
 #define CB_SM2_SIGNATURE_BYTES 64
+#define CB_SM2_DERIVATEKEY_BYTES 16
 
 /**
  * @brief 压缩SM2国密算法的公钥
@@ -54,13 +55,13 @@ int cb_sm2_sign_verify(const unsigned char *puk, const char *id, const unsigned 
  * @param puk 返回的公钥,以0x04开头,长度固定为65
  * @return 成功返回0，否则表示失败
  */
-int cb_sm2_compute_puk(const char* pvk, char* puk);
+int cb_sm2_get_puk_from_pvk(const char* pvk, char* puk);
 
 /**
  *  @brief 生成SM2公私密钥对
  *  @details 生成一组SM2公私密钥对
  * 
- *  @param pk 生成的公钥，未经压缩，以0x04开头
+ *  @param pk 生成的公钥，未经压缩，以0x04开头,长度固定65
  *  @param sk 生成的私钥
  *  @return 成功返回0，否则表示失败
  */

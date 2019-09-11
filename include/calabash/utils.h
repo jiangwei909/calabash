@@ -19,8 +19,7 @@
  *  \param param
  *  \return return type
  */
-int decode_cipher_text(const unsigned char* cipher_text, int cipher_text_len,
-				   unsigned char* no_fmt_string, int* no_fmt_string_len);
+int cb_ut_decode_ec_sign_str(const unsigned char* str, int str_len, unsigned char* out_str);
 
 /**
  *  \brief 将密文信息转换成openssl中识别的格式
@@ -30,7 +29,9 @@ int decode_cipher_text(const unsigned char* cipher_text, int cipher_text_len,
  *  \param param
  *  \return return type
  */
-int encode_cipher_text(const char* cipher, int cipher_len, char* encoded_cipher, int* encoded_cipher_len);
+// int encode_cipher_text(const char* cipher, int cipher_len, char* encoded_cipher, int* encoded_cipher_len);
+int cb_ut_encode_ec_sign_str(const unsigned char* str, int str_len, unsigned char* out_str);
 
-
+int cb_ut_decode_ec_cipher_str(const unsigned char* str, int str_len, unsigned char* out_str);
+int cb_ut_encode_ec_cipher_str(const unsigned char* str, int str_len, unsigned char* out_str);
 #endif /* UTILS_H */
