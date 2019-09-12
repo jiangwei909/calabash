@@ -82,42 +82,42 @@ int cb_sm4_cbc_decrypt(const char* key, const char* iv, const char* ciphertext,
 
 int cb_sm4_mac(const char* key, const char* iv, const char* data, int data_len, char* mac)
 {
-    // unsigned int padding_len = 0;
-    // char* plain = NULL;
-    // char* cipher = NULL;
-    // padding_len = 16 - data_len  % 16;
+    unsigned int padding_len = 0;
+    char* plain = NULL;
+    char* cipher = NULL;
+    padding_len = 16 - data_len  % 16;
 
-    // plain = malloc(data_len + 8 + padding_len);
-    // cipher = malloc(data_len + 8 + padding_len);
+    plain = malloc(data_len + 8 + padding_len);
+    cipher = malloc(data_len + 8 + padding_len);
 
-    // memcpy(plain, data, data_len);
-    // for(int i = 0; i< padding_len; i++) {
-    //     if (i == 0) {
-    //         plain[data_len + i] = 0x80;
-    //     } else {
-    //         plain[data_len + i] = 0x0;
-    //     }
-    // }
+    memcpy(plain, data, data_len);
+    for(int i = 0; i< padding_len; i++) {
+        if (i == 0) {
+            plain[data_len + i] = 0x80;
+        } else {
+            plain[data_len + i] = 0x0;
+        }
+    }
 
-    // int cipher_len = cb_sm4_cbc_encrypt(key, iv, plain, data_len + padding_len, cipher);
+    int cipher_len = cb_sm4_cbc_encrypt(key, iv, plain, data_len + padding_len, cipher);
 
-    // memcpy(mac, cipher + cipher_len - 16, 16);
+    memcpy(mac, cipher + cipher_len - 16, 16);
 
-    // free(cipher);
-    // free(plain);
+    free(cipher);
+    free(plain);
 
     return 0;
 }
 
 int cb_sm4_mac_verify(const char* key, const char* iv, const char* data, int data_len, const char* mac)
 {
-    // char actual_mac[CB_SM4_MAC_BYTES] = { 0x0 };
+    char actual_mac[CB_SM4_MAC_BYTES] = { 0x0 };
 
-    // cb_sm4_mac(key, iv, data, data_len, actual_mac);
+    cb_sm4_mac(key, iv, data, data_len, actual_mac);
 
-    // for(int i = 0; i< CB_SM4_MAC_BYTES; i++) {
-    //     if (actual_mac[i] != mac[i]) return -1;
-    // }
+    for(int i = 0; i< CB_SM4_MAC_BYTES; i++) {
+        if (actual_mac[i] != mac[i]) return -1;
+    }
 
     return 0;
 }
