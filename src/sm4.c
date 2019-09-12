@@ -112,9 +112,9 @@ int cb_sm4_mac(const char* key, const char* iv, const char* data, int data_len, 
 int cb_sm4_mac_verify(const char* key, const char* iv, const char* data, int data_len, const char* mac)
 {
     char actual_mac[CB_SM4_MAC_BYTES] = { 0x0 };
-
+    
     cb_sm4_mac(key, iv, data, data_len, actual_mac);
-
+    
     for(int i = 0; i< CB_SM4_MAC_BYTES; i++) {
         if (actual_mac[i] != mac[i]) return -1;
     }

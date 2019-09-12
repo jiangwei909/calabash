@@ -70,11 +70,11 @@ int cb_secretbox_easy(const char* sk, const char* data, unsigned int data_len, c
     
     // 计算MAC key
     cb_kdf_derive_from_key(sk, CB_SECRETBOX_MACKEY_ID, CB_SECRETBOX_DERIVATION_CONTENT, CB_SECRETBOX_KEY_BYTES, mackey);
-
+    
     // 计算MAC
     cb_sm3_digest(cipher, cipher_len, digest);
     cb_sm4_mac(mackey, mac_iv, digest, 32, mac);
-
+    
     memcpy(cipher + cipher_len, mac, 16);
 
     ret = plain_len + CB_SECRETBOX_CBCMAC_BYTES;
@@ -99,9 +99,9 @@ int cb_secretbox_open_easy(const char* sk, const char* data, unsigned int data_l
     // step 1, verify mac
     //  计算MAC key
     cb_kdf_derive_from_key(sk, CB_SECRETBOX_MACKEY_ID, CB_SECRETBOX_DERIVATION_CONTENT, CB_SECRETBOX_KEY_BYTES, mackey);
-
+    
     cb_sm3_digest(data, data_len - CB_SECRETBOX_CBCMAC_BYTES, digest);
-
+    
     if (cb_sm4_mac_verify(mackey, mac_iv, digest, 32, data + data_len - CB_SECRETBOX_CBCMAC_BYTES) != 0 ) {
         return -2;
     }

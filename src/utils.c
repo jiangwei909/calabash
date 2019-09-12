@@ -97,7 +97,7 @@ int cb_ut_encode_ec_cipher_str(const unsigned char* str, int str_len, unsigned c
     // part 1 and part 2, part 3
     
     for(int i = 0; i < 3; i++) {
-	if ((*(str + i*32)&0x80) == 0x80) {
+	if (((*(str + i*32)&0x80) == 0x80) && i < 2) {
 	    prefix_pad_len = 1;
 	}
 

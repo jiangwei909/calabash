@@ -56,22 +56,19 @@ int cb_publicbox_seal_open(const char* sk, const char* data, unsigned int data_l
     int ret = 0;
     int session_key_offset = 0;
     char session_key[CB_PUBLICBOX_SESSIONKEY_BYTES] = { 0x0 };
-
-    cb_debug("data[0] = %02X", (data[0]&0xff));
-
+    
     if ((data[0] &0xff) == 0x81) {
         return  cb_sm2_decrypt(sk, data + 1, data_len - 1, plain);
     } else if ((data[0] &0xff) == 0x82) {
-        // step 1, 解密会话密钥
-        session_key_offset = data_len - 224;
+        // step 1, 解密会话密钥, 会话密钥由公钥加密后的长度是112
+        session_key_offset = data_len - 112;
 
-        cb_debug("data len = %d, offset=%d", data_len, session_key_offset);
-        ret = cb_sm2_decrypt(sk, data + session_key_offset, 224, session_key);
-        cb_debug("ret = %d", ret);
+        ret = cb_sm2_decrypt(sk, data + session_key_offset, 112, session_key);
+    
         if (ret != CB_PUBLICBOX_SESSIONKEY_BYTES) return -1;
 
-        // step 2, 解密数据
-        len = cb_secretbox_open_easy(session_key, data, data_len - 1 - 224, plain);
+        // step 2, 解密数据,去掉头部信息
+        len = cb_secretbox_open_easy(session_key, data + 1, data_len - 1 - 112, plain);
     }
 
     return len;
