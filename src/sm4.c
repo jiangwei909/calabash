@@ -20,59 +20,64 @@
 #include "calabash/utils.h"
 
 
-int cb_sm4_ecb_encrypt(const char* key, const char* plain, int plain_len, char* cipher)
+static inline int _do_cipher(EVP_CIPHER* cipher, int pad, int enc, const char* key,
+			     const char* iv, const char* in, int inl, char* out)
 {
-    /*
-    sms4_key_t sm4_key;
+    EVP_CIPHER_CTX *ctx = NULL;
+    int ret = 0;
+    size_t out_len = 0;
+    int total_len =0;
     
-    sms4_set_encrypt_key(&sm4_key, key);
+    ctx = EVP_CIPHER_CTX_new();
 
-    for (int i = 0; i < plain_len / 16; i++) {
-	sms4_encrypt(plain + i*16, cipher + i*16, &sm4_key);
-    }
+    cb_debug("in len=%d", inl);
+    EVP_CipherInit(ctx, cipher, key, iv, enc);
+    EVP_CIPHER_CTX_set_padding(ctx, pad);
     
-    return plain_len;
-    */
-   return -1;
+    EVP_CipherUpdate(ctx, out, &out_len, in, inl);
+    total_len += out_len; 
+        
+    EVP_CipherFinal(ctx, out + total_len, &out_len);
+    total_len += out_len;
+    cb_debug("out len=%d", total_len);
+    
+    return total_len;
 }
 
 
-int cb_sm4_ecb_decrypt(const char* key, const char* cipher, int cipher_len, char* plain)
+int cb_sm4_ecb_encrypt(const char* key, const char* plain, int plain_len,
+		       char* ciphertext)
 {
-    // sms4_key_t sm4_key;
+    EVP_CIPHER *cipher = NULL;
+    cipher = EVP_sm4_ecb();
     
-    // sms4_set_decrypt_key(&sm4_key, key);
-
-    // for (int i = 0; i < cipher_len / 16; i++) {
-	// sms4_decrypt(cipher + i*16, plain + i*16, &sm4_key);
-    // }
-    
-    // return cipher_len;
-     return -1;
+    return _do_cipher(cipher, 0, 1, key, NULL, plain, plain_len, ciphertext);
 }
 
-int cb_sm4_cbc_encrypt(const char* key, const char* iv, const char* plain, int plain_len, char* cipher)
+int cb_sm4_ecb_decrypt(const char* key, const char* ciphertext, int ciphertext_len, char* plain)
 {
-    // sms4_key_t sm4_key;
+    EVP_CIPHER *cipher = NULL;
+    cipher = EVP_sm4_ecb();
     
-    // sms4_set_encrypt_key(&sm4_key, key);
-
-    // sms4_cbc_encrypt(plain, cipher, plain_len, &sm4_key, iv, 1);
-
-    // return plain_len;
-     return -1;
+    return _do_cipher(cipher, 0, 0, key, NULL, ciphertext, ciphertext_len, plain);    
 }
 
-int cb_sm4_cbc_decrypt(const char* key, const char* iv, const char* cipher, int cipher_len, char* plain)
+int cb_sm4_cbc_encrypt(const char* key, const char* iv, const char* plain,
+		       int plain_len, char* ciphertext)
 {
-    // sms4_key_t sm4_key;
+    EVP_CIPHER *cipher = NULL;
+    cipher = EVP_sm4_cbc();
     
-    // sms4_set_decrypt_key(&sm4_key, key);
+    return _do_cipher(cipher, 0, 1, key, iv, plain, plain_len, ciphertext);
+}
 
-    // sms4_cbc_encrypt(cipher, plain, cipher_len, &sm4_key, iv, 0);
-
-    // return cipher_len;
-     return -1;
+int cb_sm4_cbc_decrypt(const char* key, const char* iv, const char* ciphertext,
+		       int ciphertext_len, char* plain)
+{
+    EVP_CIPHER *cipher = NULL;
+    cipher = EVP_sm4_cbc();
+    
+    return _do_cipher(cipher, 0, 0, key, iv, ciphertext, ciphertext_len, plain);    
 }
 
 int cb_sm4_mac(const char* key, const char* iv, const char* data, int data_len, char* mac)
