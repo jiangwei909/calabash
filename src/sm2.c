@@ -323,6 +323,12 @@ int cb_sm2_sign_verify(const unsigned char *puk, const char *id, const unsigned 
     }
     ret = 0;
 end:
+    EVP_PKEY_free(pkey);
+    EC_KEY_free(ec_key);
+    EC_GROUP_free(group);
+    EVP_MD_CTX_free(mctx);
+    EVP_PKEY_CTX_free(sctx);
+    
 return ret;
 
 }
