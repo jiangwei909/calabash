@@ -365,7 +365,7 @@ int cb_sm2_keypair(char* pk, char* sk)
 end:
     EC_GROUP_free(curve_group);
     EC_KEY_free(ec_key);
-
+    
     return ret;
 }
 
@@ -378,18 +378,18 @@ int cb_sm2_encrypt(const char* pk, const char* plain, int plain_len, char* ciphe
     //int ctext_len = 256;
     size_t ctext_len = 256;
 
-    char ciphertext[256] = { 0x0 };
     unsigned long ulErr;
     char szErrMsg[1024] = { 0x0 };
     char *pTmp = NULL;
-    BIO *bio = NULL;
     int ec_ret = -1;
     int ret = 0;
     int publickey_offset = 0;
     
     BIGNUM* x = NULL;
     BIGNUM* y = NULL;
-    char tmp_buff[256] = { 0x0 };
+    char buff[512] = { 0x0 };
+
+    if (plain_len > 256) return -1;
     
     group = EC_GROUP_new_by_curve_name(NID_sm2);
     ec_key = EC_KEY_new();
@@ -398,7 +398,7 @@ int cb_sm2_encrypt(const char* pk, const char* plain, int plain_len, char* ciphe
         ulErr = ERR_get_error();
         pTmp = ERR_error_string(ulErr,szErrMsg); 
         cb_debug("pctx szErrMsg is:%s", szErrMsg);
-        return -1;
+        return -2;
     }
 
     if ((pk[0]&0xFF) == 0x4) publickey_offset = 1;
@@ -429,26 +429,20 @@ int cb_sm2_encrypt(const char* pk, const char* plain, int plain_len, char* ciphe
     EVP_PKEY_set_alias_type(pkey, EVP_PKEY_SM2);
     
 
-        // step 3
+    // step 3
     cctx = EVP_PKEY_CTX_new(pkey, NULL);
-    // if (cctx == NULL) {
-    //     ulErr = ERR_get_error();
-    //     pTmp = ERR_error_string(ulErr,szErrMsg); 
 
-    //     cb_debug("pctx is:%s", szErrMsg);
-    // }
-    cb_debug("plain lenis:%d", plain_len);
     EVP_PKEY_encrypt_init(cctx);
-
-    EVP_PKEY_encrypt(cctx, tmp_buff, &ctext_len, plain, plain_len);
+    EVP_PKEY_encrypt(cctx, buff, &ctext_len, plain, plain_len);
+    cb_debug("ctext len is:%d", ctext_len);
     
-    ctext_len = cb_ut_decode_ec_cipher_str(tmp_buff, ctext_len, cipher);
+    ctext_len = cb_ut_decode_ec_cipher_str(buff, ctext_len, cipher);
     ret = ctext_len;
+    
 end:
     EVP_PKEY_CTX_free(cctx);
     EVP_PKEY_free(pkey);
-    BIO_free(bio);
-
+    
     return ret;
 }
 
@@ -463,7 +457,7 @@ int cb_sm2_decrypt(const char* sk, const char* cipher, int cipher_len, char* pla
 
     int ret = -1;
     size_t plain_len = 0;
-    char tmp_buff[512] = { 0x0 };
+    char buff[512] = { 0x0 };
     
     pvk_bn = BN_bin2bn(sk, CB_SM2_SECRETKEY_BYTES, NULL);
     ec_key = EC_KEY_new_by_curve_name(NID_sm2);
@@ -484,9 +478,9 @@ int cb_sm2_decrypt(const char* sk, const char* cipher, int cipher_len, char* pla
     cctx = EVP_PKEY_CTX_new(pkey, NULL);
     EVP_PKEY_decrypt_init(cctx);
 
-    int tmp_len = cb_ut_encode_ec_cipher_str(cipher, cipher_len, tmp_buff);
+    int tmp_len = cb_ut_encode_ec_cipher_str(cipher, cipher_len, buff);
     
-    EVP_PKEY_decrypt(cctx, plain, &plain_len, tmp_buff, tmp_len);
+    EVP_PKEY_decrypt(cctx, plain, &plain_len, buff, tmp_len);
     ret = plain_len;
     
 end:
@@ -495,8 +489,6 @@ end:
     EVP_PKEY_free(pkey);
     EVP_PKEY_CTX_free(cctx);
 
-    cb_debug("plain len=%d", ret);
-    
     return ret;
 }
 
