@@ -106,6 +106,15 @@ int cb_sm2_decrypt(const char* pk, const char* cipher, int cipher_len, char* pla
  */
 int cb_sm3_digest(const char* data, int data_len, char* digest);
 
+/**
+ *  @brief 计算SM2交换密钥
+ *  @details 计算SM2交换密钥
+ *
+ *  @param private_key 本方私钥
+ *  @param public_key 对方公钥,必须是非压缩的公钥，且以0x04开头，长度固定65字节
+ *  @param key 生成的密钥,固定长16字节
+ *  @return 成功返回0，否则表示失败
+ */
 int cb_sm2_compute_key(const char* private_key, const char* public_key, char* key);
 
 #endif //CALABASH_H

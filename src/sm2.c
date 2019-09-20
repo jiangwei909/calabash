@@ -511,16 +511,12 @@ static inline void *kdf_sm3(const char* in, int in_len, char* out, int *out_len)
 
 int cb_sm2_compute_key(const char* private_key, const char* public_key, char* key)
 {
-    char buf[32] = { 0x0 };
-
     EC_KEY* ec_key = NULL;
     EC_GROUP* group = NULL;
     EC_POINT* puk_point = NULL;
     BIGNUM* prv_bn = NULL;
 
-    char encoded_cipher[512] = { 0x0 };
-    int encoded_cipher_len = 0;
-    int ret = -1;
+    int ret = 0;
 
     prv_bn = BN_bin2bn(private_key, 32, NULL);
     ec_key = EC_KEY_new_by_curve_name(NID_sm2);
@@ -529,14 +525,17 @@ int cb_sm2_compute_key(const char* private_key, const char* public_key, char* ke
 
     if (!EC_KEY_set_private_key(ec_key, prv_bn))
     {
-        printf("set private key failed.\n");
-        return -1;
+        cb_debug("set private key failed.\n");
+        ret = -1;
+	goto end;
     }
 
     EC_POINT_oct2point(group, puk_point, public_key, CB_SM2_PUBLICKEY_BYTES, NULL);
 
-    ret = ECDH_compute_key(key, CB_SM2_DERIVATEKEY_BYTES, puk_point,ec_key, kdf_sm3);
-
+    int tmp_ret = ECDH_compute_key(key, CB_SM2_DERIVATEKEY_BYTES,
+				   puk_point, ec_key, kdf_sm3);
+    if (tmp_ret != CB_SM2_DERIVATEKEY_BYTES) ret = -2;
+    
 end:
     EC_KEY_free(ec_key);
     EC_POINT_free(puk_point);

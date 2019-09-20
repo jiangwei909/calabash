@@ -56,6 +56,15 @@ int cb_kx_svr_session_key(const char* sk, const char* rx_rnd, const char* tx_pk_
  */
 int cb_kx_clt_session_key(const char* rx_rnd, const char* tx_rnd, char* key);
 
+/**
+ *  @brief 计算交换密钥
+ *  @details 采用DH算法计算交换密钥
+ *
+ *  @param sk 本方私钥
+ *  @param peer_pk 对方公钥,必须是非压缩的公钥，且以0x04开头，长度固定65字节
+ *  @param key 生成的密钥,固定长16字节
+ *  @return 成功返回0，否则表示失败
+ */
 int cb_kx_dh_session_key(const char* sk, const char* peer_pk, char* key);
 
 #endif // !KEYEXCHANGE_H

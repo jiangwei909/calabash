@@ -129,7 +129,7 @@ void test_cb_sm2_compute_key()
 
     int ret = cb_sm2_compute_key(pvk_bin, puk_bin, key);
 
-    TEST_ASSERT_EQUAL_INT(16, ret);
+    TEST_ASSERT_EQUAL_INT(0, ret);
 
     cb_bin_to_hex(key, ret, key_hex);
     cb_debug("key hex=%s", key_hex);
@@ -144,7 +144,7 @@ void test_cb_sm2_compute_key()
     cb_bin_to_hex(key2, ret, key2_hex);
     cb_debug("key2 hex=%s", key2_hex);
 
-    TEST_ASSERT_EQUAL_INT(16, ret);
+    TEST_ASSERT_EQUAL_INT(0, ret);
     TEST_ASSERT_EQUAL_STRING(key_hex, key2_hex);
 }
 
