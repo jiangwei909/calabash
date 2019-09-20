@@ -45,22 +45,22 @@ int cb_secretbox_open_easy(const char* sk, const char* data, unsigned int data_l
  * @brief 生成消息认证码
  * @details 生成消息认证码,算法采用HMAC-SM3
  *
- * @param sk 秘密密钥
- * @param data 待解密的数据
- * @param data_len 待解密数据的长度
- * @param mac 消息认证码
- * @return 返回消息认证码的长度
+ * @param sk 秘密密钥,固定长度16字节
+ * @param data 待计算的数据
+ * @param data_len 待计算数据的长度
+ * @param hmac 消息认证码,固定长度32字节
+ * @return 成功返回0，否则表示失败
  */
-int cb_secretbox_auth(const char* sk, const char* data, unsigned int data_len, char* mac);
+int cb_secretbox_auth(const char* sk, const char* data, unsigned int data_len, char* hmac);
 
 /**
  * @brief 消息认证码验证
  * @details 消息认证码验证,算法采用HMAC-SM3
  *
  * @param sk 秘密密钥
- * @param data 待解密的数据
- * @param data_len 待解密数据的长度
- * @param mac 待验证的消息认证码
+ * @param data 待计算的数据
+ * @param data_len 待计算数据的长度
+ * @param hmac 待验证的消息认证码,固定长度32字节
  * @return 成功返回0，其他表示失败
  */
 int cb_secretbox_auth_verify(const char* sk, const char* data, unsigned int data_len, const char* mac);

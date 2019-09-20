@@ -135,8 +135,10 @@ int cb_secretbox_auth(const char* sk, const char* data, unsigned int data_len, c
     int md_len = 0;
     
     HMAC(EVP_sm3(), sk, CB_SECRETBOX_KEY_BYTES, data, data_len, mac, &md_len);
-
-    return md_len;
+    
+    if (md_len == CB_SECRETBOX_AUTHMAC_BYTES) return 0;
+    
+    return -1;
 }
 
 int cb_secretbox_auth_verify(const char* sk, const char* data, unsigned int data_len, const char* mac)
