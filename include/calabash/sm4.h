@@ -54,8 +54,30 @@ int cb_sm4_cbc_encrypt(const char* key, const char* iv, const char* plain, int p
  */
 int cb_sm4_cbc_decrypt(const char* key, const char* iv, const char* cipher, int cipher_len, char* plain);
 
-int cb_sm4_mac(const char* key, const char* iv, const char* cipher, int cipher_len, char* mac);
+/**
+ *  @brief SM4进行MAC计算
+ *  @details SM4进行MAC计算, 数据填充方式采用ISO/IEC 9797-1中的填充方式2，即数据后面补0x80,直到16的倍数
+ *
+ *  @param key 密钥的明文,必须16字节长
+ *  @param iv 初始化向量,必须16字节长
+ *  @param data 待计算的数据
+ *  @param data_len 待计算数据的长度
+ *  @param mac 返回的MAC值，固定长度为16字节
+ *  @return 成功返回0，其他值表示失败
+ */
+int cb_sm4_mac(const char* key, const char* iv, const char*  data, int data_len, char* mac);
 
+/**
+ *  @brief SM4进行MAC验证
+ *  @details SM4进行MAC验证, 数据填充方式采用ISO/IEC 9797-1中的填充方式2，即数据后面补0x80,直到16的倍数
+ *
+ *  @param key 密钥的明文,必须16字节长
+ *  @param iv 初始化向量,必须16字节长
+ *  @param data 待计算的数据
+ *  @param data_len 待计算数据的长度
+ *  @param mac 待验证的MAC值，固定长度为16字节
+ *  @return 成功返回0，其他值表示失败
+ */
 int cb_sm4_mac_verify(const char* key, const char* iv, const char* data, int data_len, const char* mac);
 
 #endif // !SM4_H

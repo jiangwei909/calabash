@@ -85,6 +85,9 @@ int cb_sm4_mac(const char* key, const char* iv, const char* data, int data_len, 
     unsigned int padding_len = 0;
     char* plain = NULL;
     char* cipher = NULL;
+
+    if (data_len <= 0) return -1;
+    
     padding_len = 16 - data_len  % 16;
 
     plain = malloc(data_len + 8 + padding_len);
@@ -101,6 +104,7 @@ int cb_sm4_mac(const char* key, const char* iv, const char* data, int data_len, 
 
     int cipher_len = cb_sm4_cbc_encrypt(key, iv, plain, data_len + padding_len, cipher);
 
+    // the last block is mac
     memcpy(mac, cipher + cipher_len - 16, 16);
 
     free(cipher);
@@ -112,11 +116,13 @@ int cb_sm4_mac(const char* key, const char* iv, const char* data, int data_len, 
 int cb_sm4_mac_verify(const char* key, const char* iv, const char* data, int data_len, const char* mac)
 {
     char actual_mac[CB_SM4_MAC_BYTES] = { 0x0 };
+
+    if (data_len <= 0) return -1; 
     
     cb_sm4_mac(key, iv, data, data_len, actual_mac);
     
     for(int i = 0; i< CB_SM4_MAC_BYTES; i++) {
-        if (actual_mac[i] != mac[i]) return -1;
+        if (actual_mac[i] != mac[i]) return -2;
     }
 
     return 0;
