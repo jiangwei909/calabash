@@ -319,6 +319,7 @@ int cb_sm2_sign_verify(const unsigned char *puk, const char *id, const unsigned 
         pTmp = ERR_error_string(ulErr,szErrMsg); 
 
         cb_debug("pctx is:%s", szErrMsg);
+        ret = -7;
         goto end;
     }
     ret = 0;
